@@ -709,47 +709,55 @@
             gap: 8px;
         }
 
-        /* Flatpickr customization */
+        /* Flatpickr Dark Theme */
         .flatpickr-calendar {
-            color: white;
+            background: #000000 !important;
+            color: #ffffff !important;
+            border: 1px solid var(--border-color, #444);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Days */
+        .flatpickr-day {
             background: #000000;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            color: #ffffff;
         }
 
         .flatpickr-day.selected {
-            background: var(--brand-color);
-            border-color: white;
+            background: var(--brand-color, #007bff);
+            color: #ffffff;
+            border-color: #ffffff;
         }
 
         .flatpickr-day.today {
-            border-color: var(--brand-color);
+            border: 1px solid var(--brand-color, #007bff);
         }
 
         .flatpickr-day:hover {
-            background: var(--brand-color-light);
+            background: var(--brand-color-light, #444);
+            color: #ffffff;
         }
 
+        /* Month & Year */
         .flatpickr-months .flatpickr-month {
-            color: var(--text-color);
+            color: #ffffff;
         }
 
-        .flatpickr-weekdays {
+        .flatpickr-current-month .flatpickr-monthDropdown-months,
+        .flatpickr-current-month input.cur-year {
             background: #000000;
+            color: #ffffff;
+            border: none;
+        }
+
+        /* Weekdays */
+        .flatpickr-weekdays {
+            background: #808080;
+            color: #ffffff;
         }
 
         .flatpickr-weekday {
-            color: var(--text-color);
-        }
-
-        .flatpickr-current-month .flatpickr-monthDropdown-months {
-            background: #000000;
-            color: var(--text-color);
-        }
-
-        .flatpickr-current-month input.cur-year {
-            background: #000000;
-            color: white;
+            color: #ffffff;
         }
 
         .connection-point-container {
