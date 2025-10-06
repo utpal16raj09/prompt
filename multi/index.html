@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <style>
         :root {
             --bg-color: #111111;
@@ -68,6 +70,127 @@
 
         .node.selected {
             box-shadow: 0 0 0 3px var(--brand-color-light), 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .node-body {
+            padding: 0 12px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .toggle-switch .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+
+        .toggle-switch .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-switch .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #3a3a3a;
+            transition: .4s;
+            border-radius: 20px;
+        }
+
+        .toggle-switch .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked+.slider {
+            background-color: var(--brand-color);
+        }
+
+        .toggle-switch input:checked+.slider:before {
+            transform: translateX(20px);
+        }
+
+        .calendar-picker {
+            background: #2a2a2a;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .connection-insert-handle {
+            fill: var(--border-color);
+            r: 0;
+            cursor: pointer;
+            transition: r 0.2s ease;
+        }
+
+        .connection-group:hover .connection-insert-handle {
+            r: 6;
+        }
+
+        .connection-insert-handle:hover {
+            fill: var(--brand-color);
+        }
+
+        .tags-input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .tags-input-area input {
+            background: #2a2a2a;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 6px 8px;
+            font-size: 13px;
+        }
+
+        .connection-point-circle {
+            fill: var(--brand-color);
+            r: 6;
+            cursor: crosshair;
+            transition: all 0.2s ease;
+            opacity: 0;
+            stroke: var(--node-bg);
+            stroke-width: 2;
+        }
+
+        .connection-group:hover .connection-point-circle {
+            opacity: 1;
+            r: 8;
+        }
+
+        .connection-point-circle:hover {
+            fill: var(--blue-color);
+            r: 10;
+            opacity: 1;
         }
 
         /* Node category colors */
@@ -564,6 +687,147 @@
             background-color: var(--border-color);
             margin: 6px 0;
         }
+
+        /* Conversation Node Layout */
+        .conversation-layout {
+            display: flex;
+            gap: 12px;
+        }
+
+        .conversation-vertical {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .conversation-horizontal {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Flatpickr customization */
+        .flatpickr-calendar {
+            background: #2a2a2a;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .flatpickr-day.selected {
+            background: var(--brand-color);
+            border-color: var(--brand-color);
+        }
+
+        .flatpickr-day.today {
+            border-color: var(--brand-color);
+        }
+
+        .flatpickr-day:hover {
+            background: var(--brand-color-light);
+        }
+
+        .flatpickr-months .flatpickr-month {
+            color: var(--text-color);
+        }
+
+        .flatpickr-weekdays {
+            background: #2a2a2a;
+        }
+
+        .flatpickr-weekday {
+            color: var(--text-color);
+        }
+
+        .flatpickr-current-month .flatpickr-monthDropdown-months {
+            background: #2a2a2a;
+            color: var(--text-color);
+        }
+
+        .flatpickr-current-month input.cur-year {
+            background: #2a2a2a;
+            color: var(--text-color);
+        }
+
+        .connection-point-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+        }
+
+        .connection-point {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .connection-point-label {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .connection-point-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .connection-point-dot:hover {
+            background-color: var(--brand-color);
+            transform: scale(1.2);
+        }
+
+        /* Tags Section */
+        .tags-section {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .tag-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .tag-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .tag-text {
+            flex: 1;
+            background: #2a2a2a;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 13px;
+            color: var(--text-color);
+        }
+
+        .add-tag-btn {
+            background: var(--brand-color);
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        .add-tag-btn:hover {
+            background: #9333ea;
+        }
     </style>
 </head>
 
@@ -716,6 +980,9 @@
             let clipboard = [];
             let activeChannel = 'all';
             let nodesToDelete = [];
+            let connectionStartFromLine = null;
+
+            let connectionStartConnector = null;
 
             let selectedNodeIds = new Set();
             let isDraggingNode = false, isDrawingConnection = false, isPanning = false, isSelecting = false;
@@ -765,9 +1032,11 @@
                         icon: `<i class="fas fa-comments text-blue-400 text-xl"></i>`,
                         category: 'communication',
                         properties: {
-                            participants: { type: 'text', label: 'Participants', value: 'user, assistant' },
-                            topic: { type: 'text', label: 'Topic', value: 'General discussion' },
-                            description: { type: 'textarea', label: 'Description', value: 'Conversation settings' }
+                            purpose: { type: 'textarea', label: 'Purpose', value: 'The main purpose of this node...' },
+                            context: { type: 'textarea', label: 'Context', value: 'Context depends on...' },
+                            dataExtraction: { type: 'textarea', label: 'Data Extraction', value: '' },
+                            dataOutput: { type: 'text', label: 'Data Output', value: '' },
+                            advancedSettings: { type: 'textarea', label: 'Advanced Settings', value: '' }
                         }
                     },
                     {
@@ -800,13 +1069,10 @@
                         properties: {
                             subject: { type: 'text', label: 'Subject', value: 'Important Update' },
                             recipients: { type: 'text', label: 'Recipients', value: 'user@example.com' },
-                            cc: { type: 'text', label: 'CC', value: '' },
-                            bcc: { type: 'text', label: 'BCC', value: '' },
-                            body: { type: 'textarea', label: 'Body', value: 'Dear user,...' },
-                            attachments: { type: 'text', label: 'Attachments', value: 'None' },
-                            description: { type: 'textarea', label: 'Description', value: 'Email configuration' }
+                            body: { type: 'textarea', label: 'Body', value: 'Dear user,...' }
                         }
                     }
+
                 ],
                 control: [
                     {
@@ -832,6 +1098,16 @@
                             },
                             conditions: { type: 'textarea', label: 'Conditions', value: 'Trigger conditions' },
                             description: { type: 'textarea', label: 'Description', value: 'Trigger configuration' }
+                        }
+                    },
+                    {
+                        type: 'path_conditions',
+                        name: 'Path Conditions',
+                        icon: `<i class="fas fa-code-branch text-pink-400 text-xl"></i>`,
+                        category: 'control',
+                        properties: {
+                            description: { type: 'textarea', label: 'Description', value: 'Decide conditions when to move to next stage' },
+                            conditions: { type: 'textarea', label: 'Conditions', value: 'Define path conditions here...' }
                         }
                     },
                     {
@@ -915,10 +1191,9 @@
                         icon: `<i class="fas fa-calendar-check text-purple-400 text-xl"></i>`,
                         category: 'ai',
                         properties: {
-                            calendar: { type: 'text', label: 'Calendar', value: 'Google Calendar' },
-                            timezone: { type: 'text', label: 'Timezone', value: 'UTC' },
-                            location: { type: 'text', label: 'Location', value: 'Virtual Meeting' },
-                            description: { type: 'textarea', label: 'Description', value: 'Booking configuration' }
+                            calendarDate: { type: 'date', label: 'Calendar', value: '' },
+                            setTimezone: { type: 'boolean', label: 'Set Timezone', value: false },
+                            saveTimezone: { type: 'boolean', label: 'Save Contact Timezone', value: true },
                         }
                     },
                     {
@@ -976,6 +1251,7 @@
             const screenToCanvasCoords = (x, y) => ({ x: (x - pan.x) / scale, y: (y - pan.y) / scale });
             function applyTransform() {
                 transformContainer.style.transform = `translate(${pan.x}px, ${pan.y}px) scale(${scale})`;
+                // Don't re-render connections here as it causes flickering
                 renderMinimap();
             }
             const snapToGrid = val => Math.round(val / GRID_SIZE) * GRID_SIZE;
@@ -990,16 +1266,33 @@
 
             function showDeleteModal(ids) {
                 if (!Array.isArray(ids)) ids = [ids];
-                nodesToDelete = ids.filter(id => state.nodes.find(n => n.id === id && n.type !== 'start'));
+                nodesToDelete = ids.filter(id => state.nodes.find(n => n.id === id));
 
                 if (nodesToDelete.length === 0) return;
 
-                if (nodesToDelete.length > 1) {
-                    deleteModalTitle.textContent = `Delete ${nodesToDelete.length} Nodes`;
-                    deleteModalBody.textContent = `Are you sure you want to delete these ${nodesToDelete.length} nodes? This action cannot be undone.`;
+                // Check if we're trying to delete the start node
+                const hasStartNode = nodesToDelete.some(id => {
+                    const node = state.nodes.find(n => n.id === id);
+                    return node && node.type === 'start';
+                });
+
+                if (hasStartNode && nodesToDelete.length > 1) {
+                    deleteModalTitle.textContent = 'Cannot Delete Start Node';
+                    deleteModalBody.textContent = 'You cannot delete the start node along with other nodes. Please select only non-start nodes to delete.';
+                    confirmDelete.disabled = true;
+                } else if (hasStartNode) {
+                    deleteModalTitle.textContent = 'Delete Start Node';
+                    deleteModalBody.textContent = 'Are you sure you want to delete the start node? This will remove the entry point of your workflow.';
+                    confirmDelete.disabled = false;
                 } else {
-                    deleteModalTitle.textContent = 'Delete Node';
-                    deleteModalBody.textContent = 'Are you sure you want to delete this node? This action cannot be undone.';
+                    if (nodesToDelete.length > 1) {
+                        deleteModalTitle.textContent = `Delete ${nodesToDelete.length} Nodes`;
+                        deleteModalBody.textContent = `Are you sure you want to delete these ${nodesToDelete.length} nodes? This action cannot be undone.`;
+                    } else {
+                        deleteModalTitle.textContent = 'Delete Node';
+                        deleteModalBody.textContent = 'Are you sure you want to delete this node? This action cannot be undone.';
+                    }
+                    confirmDelete.disabled = false;
                 }
                 deleteModal.style.display = 'flex';
             }
@@ -1038,10 +1331,8 @@
                         <div class="flex items-center space-x-3">
                             ${icon}
                             <div>
-                            
-<h3 class="font-bold text-md" contenteditable="true" data-field="title" data-node-id="${node.id}">${node.title}</h3>
-
-<p class="text-xs text-gray-400">${nodeDef?.name || node.type}</p>
+                                <h3 class="font-bold text-md" contenteditable="true" data-field="title" data-node-id="${node.id}">${node.title}</h3>
+                                <p class="text-xs text-gray-400">${nodeDef?.name || node.type}</p>
                             </div>
                         </div>
                     </div>
@@ -1053,7 +1344,37 @@
                     </select>`;
                 }
 
-                if (nodeDef?.properties) {
+                // Special layout for conversation node
+                if (node.type === 'conversation') {
+                    content += `
+                        <div class="conversation-layout">
+                            <div class="conversation-vertical">
+                                <div class="node-field">
+                                    <label>Purpose</label>
+                                    <textarea class="field-value" data-node-id="${node.id}" data-field="purpose" placeholder="Purpose">${node.purpose || nodeDef?.properties.purpose.value || ''}</textarea>
+                                </div>
+                                <div class="node-field">
+                                    <label>Context</label>
+                                    <textarea class="field-value" data-node-id="${node.id}" data-field="context" placeholder="Context">${node.context || nodeDef?.properties.context.value || ''}</textarea>
+                                </div>
+                                <div class="node-field">
+                                    <label>Data Extraction</label>
+                                    <textarea class="field-value" data-node-id="${node.id}" data-field="dataExtraction" placeholder="Data Extraction">${node.dataExtraction || nodeDef?.properties.dataExtraction.value || ''}</textarea>
+                                </div>
+                            </div>
+                            <div class="conversation-horizontal">
+                                <div class="node-field">
+                                    <label>Data Output</label>
+                                    <input type="text" class="field-value" data-node-id="${node.id}" data-field="dataOutput" value="${node.dataOutput || nodeDef?.properties.dataOutput.value || ''}" placeholder="Data Output">
+                                </div>
+                                <div class="node-field">
+                                    <label>Advanced Settings</label>
+                                    <textarea class="field-value" data-node-id="${node.id}" data-field="advancedSettings" placeholder="Advanced Settings">${node.advancedSettings || nodeDef?.properties.advancedSettings.value || ''}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else if (nodeDef?.properties) {
                     Object.keys(nodeDef.properties).forEach(propKey => {
                         const prop = nodeDef.properties[propKey];
                         const value = node[propKey] ?? prop.value;
@@ -1068,58 +1389,262 @@
                                 fieldContent += `<option value="${option}" ${value === option ? 'selected' : ''}>${option}</option>`;
                             });
                             fieldContent += `</select>`;
+                        } else if (prop.type === 'boolean') {
+                            fieldContent = `
+                                <div class="toggle-switch">
+                                    <span>${prop.label}</span>
+                                    <label class="switch">
+                                        <input type="checkbox" class="field-value" data-node-id="${node.id}" data-field="${propKey}" ${value ? 'checked' : ''}>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            `;
+                        } else if (prop.type === 'date') {
+                            fieldContent = `<input type="text" class="field-value calendar-picker" data-node-id="${node.id}" data-field="${propKey}" value="${value}" placeholder="${prop.label}">`;
                         } else {
                             fieldContent = `<input type="${prop.type}" class="field-value" data-node-id="${node.id}" data-field="${propKey}" value="${value}" placeholder="${prop.label}">`;
                         }
 
                         content += `
                             <div class="node-field">
-                                <label>${prop.label}</label>
+                                ${prop.type !== 'boolean' ? `<label>${prop.label}</label>` : ''}
                                 ${fieldContent}
                             </div>
                         `;
                     });
                 }
 
-                if (node.type !== 'start') {
+                // Add connection points for path conditions node
+                if (node.type === 'path_conditions') {
                     content += `
-                        <button data-delete-id="${node.id}" class="delete-node-button absolute -top-2 -right-2 w-6 h-6 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center text-white text-sm transition-all" title="Delete Node">&times;</button>
+        <div class="connection-point-container">
+            <div class="connection-point">
+                <div class="connection-point-label">Yes</div>
+                <div class="connection-point-dot" data-connector="yes"></div>
+            </div>
+            <div class="connection-point">
+                <div class="connection-point-label">No</div>
+                <div class="connection-point-dot" data-connector="no"></div>
+            </div>
+        </div>
+    `;
+                }
+
+                // Add tags section for edit_tags node
+                if (node.type === 'edit_tags') {
+                    content += `
+                        <div class="tags-section">
+                            <div class="flex items-center justify-between">
+                                <label>Tags</label>
+                                <button class="add-tag-btn">+ Add Tag</button>
+                            </div>
+                            <div class="tags-list" data-node-id="${node.id}">
+                                ${renderTags(node.tags || [])}
+                            </div>
+                        </div>
                     `;
                 }
 
+                // MODIFICATION: Add delete button for ALL nodes including start node
+                content += `
+                    <button data-delete-id="${node.id}" class="delete-node-button absolute -top-2 -right-2 w-6 h-6 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center text-white text-sm transition-all" title="Delete Node">&times;</button>
+                `;
+
                 return content;
+            }
+
+            function renderTags(tags) {
+                if (!tags || tags.length === 0) {
+                    return '<div class="text-xs text-gray-500 mt-2">No tags added</div>';
+                }
+
+                return tags.map(tag => `
+                    <div class="tag-item">
+                        <div class="tag-color" style="background-color: ${tag.color || '#3B82F6'};"></div>
+                        <input type="text" class="tag-text" value="${tag.name}" placeholder="Tag name">
+                        <input type="text" class="tag-text" value="${tag.description}" placeholder="Description">
+                        <button class="delete-tag text-red-500">&times;</button>
+                    </div>
+                `).join('');
             }
 
             function renderConnections() {
                 const svgGroups = state.connections.map((conn, index) => {
                     const fromNode = state.nodes.find(n => n.id === conn.from);
                     const toNode = state.nodes.find(n => n.id === conn.to);
+
+                    // Skip if nodes not found
                     if (!fromNode || !toNode) return '';
+
                     const fromEl = document.getElementById(`node-${fromNode.id}`);
                     const toEl = document.getElementById(`node-${toNode.id}`);
+
+                    // Skip if DOM elements not found
                     if (!fromEl || !toEl) return '';
-                    const p1 = { x: fromNode.x + fromEl.offsetWidth, y: fromNode.y + fromEl.offsetHeight / 2 };
-                    const p2 = { x: toNode.x, y: toNode.y + toEl.offsetHeight / 2 };
-                    const offset = Math.abs(p2.x - p1.x) * 0.5;
-                    const d = `M ${p1.x} ${p1.y} C ${p1.x + offset} ${p1.y}, ${p2.x - offset} ${p2.y}, ${p2.x} ${p2.y}`;
-                    const t = 0.5;
-                    const midX = (1 - t) ** 3 * p1.x + 3 * (1 - t) ** 2 * t * (p1.x + offset) + 3 * (1 - t) * t ** 2 * (p2.x - offset) + t ** 3 * p2.x;
-                    const midY = (1 - t) ** 3 * p1.y + 3 * (1 - t) ** 2 * t * p1.y + 3 * (1 - t) * t ** 2 * p2.y + t ** 3 * p2.y;
-                    const iconSize = 24;
+
+                    // Use offsetWidth/offsetHeight instead of getBoundingClientRect() - they are not affected by zoom
+                    const fromWidth = fromEl.offsetWidth;
+                    const fromHeight = fromEl.offsetHeight;
+                    const toWidth = toEl.offsetWidth;
+                    const toHeight = toEl.offsetHeight;
+
+                    // Calculate connection points using fixed node dimensions
+                    const p1 = {
+                        x: fromNode.x + fromWidth,
+                        y: fromNode.y + fromHeight / 2
+                    };
+                    const p2 = {
+                        x: toNode.x,
+                        y: toNode.y + toHeight / 2
+                    };
+
+                    // Ensure we have valid points
+                    if (isNaN(p1.x) || isNaN(p1.y) || isNaN(p2.x) || isNaN(p2.y)) {
+                        return '';
+                    }
+
+                    const offset = Math.max(50, Math.abs(p2.x - p1.x) * 0.5);
+                    let d = '';
+
+                    // Handle branch connections
+                    if (conn.branchPoint) {
+                        // This is a branch connection - draw from branch point to target node
+                        const branchX = conn.branchPoint.x;
+                        const branchY = conn.branchPoint.y;
+                        const branchOffset = Math.max(50, Math.abs(p2.x - branchX) * 0.5);
+                        d = `M ${branchX} ${branchY} C ${branchX + branchOffset} ${branchY}, ${p2.x - branchOffset} ${p2.y}, ${p2.x} ${p2.y}`;
+                    } else {
+                        // Regular connection
+                        d = `M ${p1.x} ${p1.y} C ${p1.x + offset} ${p1.y}, ${p2.x - offset} ${p2.y}, ${p2.x} ${p2.y}`;
+                    }
+
+                    // Calculate multiple points along the curve for connection points
+                    const points = [];
+                    for (let t = 0.25; t < 1; t += 0.25) {
+                        let x, y;
+
+                        if (conn.branchPoint) {
+                            // For branch connections, calculate points along the branch curve
+                            const branchOffset = Math.max(50, Math.abs(p2.x - conn.branchPoint.x) * 0.5);
+                            x = (1 - t) ** 3 * conn.branchPoint.x +
+                                3 * (1 - t) ** 2 * t * (conn.branchPoint.x + branchOffset) +
+                                3 * (1 - t) * t ** 2 * (p2.x - branchOffset) +
+                                t ** 3 * p2.x;
+                            y = (1 - t) ** 3 * conn.branchPoint.y +
+                                3 * (1 - t) ** 2 * t * conn.branchPoint.y +
+                                3 * (1 - t) * t ** 2 * p2.y +
+                                t ** 3 * p2.y;
+                        } else {
+                            // For regular connections
+                            x = (1 - t) ** 3 * p1.x +
+                                3 * (1 - t) ** 2 * t * (p1.x + offset) +
+                                3 * (1 - t) * t ** 2 * (p2.x - offset) +
+                                t ** 3 * p2.x;
+                            y = (1 - t) ** 3 * p1.y +
+                                3 * (1 - t) ** 2 * t * p1.y +
+                                3 * (1 - t) * t ** 2 * p2.y +
+                                t ** 3 * p2.y;
+                        }
+                        points.push({ x, y, t });
+                    }
+
+                    // Create connection points along the curve
+                    const connectionPoints = points.map((point, pointIndex) =>
+                        `<circle cx="${point.x}" cy="${point.y}" r="6" class="connection-point-circle" 
+        data-conn-index="${index}" data-point-index="${pointIndex}" 
+        data-t-value="${point.t}" />`
+                    ).join('');
 
                     return `
-                        <g class="connection-group">
-                            <path d="${d}" class="connection-line" />
-                            <path d="${d}" class="connection-hitbox" />
-                            <foreignObject x="${midX - iconSize / 2}" y="${midY - iconSize / 2}" width="${iconSize}" height="${iconSize}">
-                                <button data-conn-index="${index}" class="connection-delete-button">&times;</button>
-                            </foreignObject>
-                        </g>
-                    `;
+            <g class="connection-group">
+                <path d="${d}" class="connection-line" />
+                <path d="${d}" class="connection-hitbox" />
+                ${connectionPoints}
+                <foreignObject x="${points[1].x - 12}" y="${points[1].y - 12}" width="24" height="24">
+                    <button data-conn-index="${index}" class="connection-delete-button">&times;</button>
+                </foreignObject>
+            </g>
+        `;
                 }).join('');
 
                 const tempLineHTML = tempLine ? tempLine.outerHTML : '';
-                svgCanvas.innerHTML = svgGroups + tempLineHTML;
+                // Clear the SVG canvas
+                svgCanvas.innerHTML = svgGroups;
+
+                // If there's a temporary line, add it to the SVG
+                if (tempLine) {
+                    svgCanvas.appendChild(tempLine);
+                }
+
+                // Re-attach event listeners for connection points
+                document.querySelectorAll('.connection-point-circle').forEach(circle => {
+                    circle.addEventListener('mousedown', (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+
+                        const connIndex = parseInt(e.target.dataset.connIndex);
+                        const tValue = parseFloat(e.target.dataset.tValue);
+
+                        if (!isNaN(connIndex) && state.connections[connIndex]) {
+                            isDrawingConnection = true;
+                            connectionStartFromLine = {
+                                connIndex: connIndex,
+                                tValue: tValue
+                            };
+
+                            // Calculate the branch point coordinates
+                            const conn = state.connections[connIndex];
+                            const fromNode = state.nodes.find(n => n.id === conn.from);
+                            const toNode = state.nodes.find(n => n.id === conn.to);
+
+                            if (fromNode && toNode) {
+                                const fromEl = document.getElementById(`node-${fromNode.id}`);
+                                const toEl = document.getElementById(`node-${toNode.id}`);
+
+                                if (fromEl && toEl) {
+                                    const fromWidth = fromEl.offsetWidth;
+                                    const fromHeight = fromEl.offsetHeight;
+                                    const toWidth = toEl.offsetWidth;
+                                    const toHeight = toEl.offsetHeight;
+
+                                    const p1 = {
+                                        x: fromNode.x + fromWidth,
+                                        y: fromNode.y + fromHeight / 2
+                                    };
+                                    const p2 = {
+                                        x: toNode.x,
+                                        y: toNode.y + toHeight / 2
+                                    };
+
+                                    const offset = Math.max(50, Math.abs(p2.x - p1.x) * 0.5);
+
+                                    // Calculate the exact branch point on the curve
+                                    const branchX = (1 - tValue) ** 3 * p1.x +
+                                        3 * (1 - tValue) ** 2 * tValue * (p1.x + offset) +
+                                        3 * (1 - tValue) * tValue ** 2 * (p2.x - offset) +
+                                        tValue ** 3 * p2.x;
+                                    const branchY = (1 - tValue) ** 3 * p1.y +
+                                        3 * (1 - tValue) ** 2 * tValue * p1.y +
+                                        3 * (1 - tValue) * tValue ** 2 * p2.y +
+                                        tValue ** 3 * p2.y;
+
+                                    // Store the branch coordinates
+                                    connectionStartFromLine.branchX = branchX;
+                                    connectionStartFromLine.branchY = branchY;
+                                }
+                            }
+
+                            // Create a properly styled temporary line
+                            tempLine = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                            tempLine.setAttribute('class', 'connection-line');
+                            tempLine.setAttribute('stroke', 'var(--brand-color)');
+                            tempLine.setAttribute('stroke-width', '3');
+                            tempLine.setAttribute('fill', 'none');
+                            tempLine.setAttribute('stroke-dasharray', '5,5'); // Make it dashed to distinguish from permanent lines
+                            svgCanvas.appendChild(tempLine);
+                        }
+                    });
+                });
             }
 
             function renderMinimap() {
@@ -1162,15 +1687,26 @@
             }
             // #endregion
 
-            // #region --- EVENT LISTENERS ---
             function attachListeners() {
                 document.querySelectorAll('.node').forEach(el => {
                     const nodeId = parseInt(el.id.split('-')[1]);
+                    const node = state.nodes.find(n => n.id === nodeId);
+
                     el.addEventListener('mousedown', e => onNodeMouseDown(e, nodeId));
 
                     el.querySelectorAll('.field-value').forEach(field => {
-                        field.addEventListener('change', handleFieldChange);
-                        field.addEventListener('input', handleFieldChange);
+                        if (field.type === 'checkbox') {
+                            field.addEventListener('change', handleFieldChange);
+                        } else {
+                            field.addEventListener('change', handleFieldChange);
+                            field.addEventListener('input', handleFieldChange);
+                        }
+                    });
+
+                    el.querySelectorAll('.output-port').forEach(port => {
+                        port.addEventListener('mousedown', e => {
+                            onConnectorMouseDown(e, nodeId);
+                        });
                     });
 
                     const channelSelector = el.querySelector('.channel-selector');
@@ -1187,19 +1723,114 @@
                     }
                     const titleEl = el.querySelector('h3[data-field="title"]');
                     if (titleEl) {
-                        titleEl.addEventListener('blur', handleFieldChange); // Reuse existing save function
+                        titleEl.addEventListener('blur', handleFieldChange);
                         titleEl.addEventListener('keydown', (e) => {
                             if (e.key === 'Enter') {
-                                e.preventDefault(); // Prevent new line on Enter
-                                e.target.blur();    // Trigger the blur event to save
+                                e.preventDefault();
+                                e.target.blur();
                             }
                         });
                     }
 
-                    if (state.nodes.find(n => n.id === nodeId)?.type !== 'start') {
+                    // Initialize calendar picker for booking nodes
+                    const calendarPicker = el.querySelector('.calendar-picker');
+                    if (calendarPicker) {
+                        flatpickr(calendarPicker, {
+                            dateFormat: "Y-m-d",
+                            allowInput: true,
+                            theme: "dark"
+                        });
+                    }
+
+                    // Handle add tag button for edit_tags nodes
+                    const addTagBtn = el.querySelector('.add-tag-btn');
+                    if (addTagBtn) {
+                        addTagBtn.addEventListener('click', () => {
+                            const node = state.nodes.find(n => n.id === nodeId);
+                            if (!node.tags) node.tags = [];
+                            node.tags.push({ name: '', description: '', color: '#3B82F6' });
+                            saveState();
+                            render();
+                        });
+                    }
+
+                    // Handle tag deletion
+                    el.querySelectorAll('.delete-tag').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const node = state.nodes.find(n => n.id === nodeId);
+                            const tagItem = e.target.closest('.tag-item');
+                            const tagIndex = Array.from(tagItem.parentNode.children).indexOf(tagItem);
+                            if (node.tags && node.tags[tagIndex]) {
+                                node.tags.splice(tagIndex, 1);
+                                saveState();
+                                render();
+                            }
+                        });
+                    });
+
+                    // Handle tag input changes
+                    el.querySelectorAll('.tag-text').forEach(input => {
+                        input.addEventListener('change', (e) => {
+                            const node = state.nodes.find(n => n.id === nodeId);
+                            const tagItem = e.target.closest('.tag-item');
+                            const tagIndex = Array.from(tagItem.parentNode.children).indexOf(tagItem);
+                            const field = e.target.classList.contains('tag-text') &&
+                                Array.from(tagItem.querySelectorAll('.tag-text')).indexOf(e.target);
+
+                            if (node.tags && node.tags[tagIndex]) {
+                                if (field === 0) {
+                                    node.tags[tagIndex].name = e.target.value;
+                                } else if (field === 1) {
+                                    node.tags[tagIndex].description = e.target.value;
+                                }
+                                saveState();
+                            }
+                        });
+                    });
+
+                    // Handle path conditions connectors
+                    el.querySelectorAll('.connection-point-dot').forEach(dot => {
+                        dot.addEventListener('mousedown', (e) => {
+                            e.stopPropagation();
+                            onConnectorMouseDown(e, nodeId, e.target.dataset.connector);
+                        });
+                    });
+
+                    // Add connectors based on node type
+                    if (node.type !== 'start') {
                         el.appendChild(createConnector(nodeId, 'in'));
                     }
-                    el.appendChild(createConnector(nodeId, 'out'));
+
+                    // Only add output connector for non-path conditions nodes
+                    if (node.type !== 'path_conditions') {
+                        el.appendChild(createConnector(nodeId, 'out'));
+                    }
+                });
+
+                // Add event listeners for connection points on edges
+                document.querySelectorAll('.connection-point-circle').forEach(circle => {
+                    circle.addEventListener('mousedown', (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+
+                        const connIndex = parseInt(e.target.dataset.connIndex);
+                        const tValue = parseFloat(e.target.dataset.tValue);
+
+                        if (!isNaN(connIndex) && state.connections[connIndex]) {
+                            // Start drawing a new connection from this edge point
+                            isDrawingConnection = true;
+                            connectionStartFromLine = {
+                                connIndex: connIndex,
+                                tValue: tValue
+                            };
+
+                            // Create temporary line
+                            tempLine = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                            tempLine.setAttribute('class', 'connection-line');
+                            tempLine.style.stroke = 'var(--brand-color)';
+                            svgCanvas.appendChild(tempLine);
+                        }
+                    });
                 });
             }
 
@@ -1219,7 +1850,11 @@
                 const node = state.nodes.find(n => n.id === nodeId);
 
                 if (node) {
-                    node[fieldName] = field.value;
+                    if (field.type === 'checkbox') {
+                        node[fieldName] = field.checked;
+                    } else {
+                        node[fieldName] = field.value;
+                    }
                     saveState();
                 }
             }
@@ -1300,7 +1935,7 @@
 
                 clipboard.forEach(node => {
                     const newNode = JSON.parse(JSON.stringify(node));
-                    if (newNode.type === 'start') return; // Do not paste start nodes
+                    if (newNode.type === 'start') return;
                     newNode.id = nextId++;
                     newNode.x += offsetX;
                     newNode.y += offsetY;
@@ -1318,7 +1953,7 @@
             // #region --- EVENT HANDLERS ---
             function onNodeMouseDown(e, nodeId) {
                 if (e.target.isContentEditable || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT' || e.target.closest('button, .node-connector')) return;
-                // ... rest of the function     
+
                 if (e.shiftKey) {
                     selectedNodeIds.has(nodeId) ? selectedNodeIds.delete(nodeId) : selectedNodeIds.add(nodeId);
                 } else if (!selectedNodeIds.has(nodeId)) {
@@ -1340,11 +1975,11 @@
 
                 render();
             }
-
-            function onConnectorMouseDown(e, nodeId) {
+            function onConnectorMouseDown(e, nodeId, connectorType = null) {
                 e.stopPropagation();
                 isDrawingConnection = true;
                 connectionStartNodeId = nodeId;
+                connectionStartConnector = connectorType; // Store which connector was used
                 tempLine = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                 tempLine.setAttribute('class', 'connection-line');
                 tempLine.style.stroke = 'var(--brand-color)';
@@ -1356,6 +1991,7 @@
                     pan.x += e.movementX;
                     pan.y += e.movementY;
                     applyTransform();
+                    renderConnections();
                     return;
                 }
                 if (isSelecting) {
@@ -1379,12 +2015,75 @@
                     });
                     render();
                 } else if (isDrawingConnection) {
-                    const fromNode = state.nodes.find(n => n.id === connectionStartNodeId);
-                    const fromEl = document.getElementById(`node-${fromNode.id}`);
-                    const p1 = { x: fromNode.x + fromEl.offsetWidth, y: fromNode.y + fromEl.offsetHeight / 2 };
-                    const p2 = { x: mousePos.x, y: mousePos.y };
-                    const d = `M ${p1.x} ${p1.y} C ${p1.x + Math.abs(p2.x - p1.x) * 0.5} ${p1.y}, ${p2.x - Math.abs(p2.x - p1.x) * 0.5} ${p2.y}, ${p2.x} ${p2.y}`;
-                    tempLine.setAttribute('d', d);
+                    if (connectionStartFromLine) {
+                        // Drawing from connection point
+                        const conn = state.connections[connectionStartFromLine.connIndex];
+                        const fromNode = state.nodes.find(n => n.id === conn.from);
+                        const toNode = state.nodes.find(n => n.id === conn.to);
+
+                        if (fromNode && toNode) {
+                            const fromEl = document.getElementById(`node-${fromNode.id}`);
+                            const toEl = document.getElementById(`node-${toNode.id}`);
+
+                            if (fromEl && toEl) {
+                                const fromWidth = fromEl.offsetWidth;
+                                const fromHeight = fromEl.offsetHeight;
+                                const toWidth = toEl.offsetWidth;
+                                const toHeight = toEl.offsetHeight;
+
+                                const p1 = {
+                                    x: fromNode.x + fromWidth,
+                                    y: fromNode.y + fromHeight / 2
+                                };
+                                const p2 = {
+                                    x: toNode.x,
+                                    y: toNode.y + toHeight / 2
+                                };
+                                const offset = Math.max(50, Math.abs(p2.x - p1.x) * 0.5);
+
+                                // Calculate start point on the curve
+                                const startX = (1 - connectionStartFromLine.tValue) ** 3 * p1.x +
+                                    3 * (1 - connectionStartFromLine.tValue) ** 2 * connectionStartFromLine.tValue * (p1.x + offset) +
+                                    3 * (1 - connectionStartFromLine.tValue) * connectionStartFromLine.tValue ** 2 * (p2.x - offset) +
+                                    connectionStartFromLine.tValue ** 3 * p2.x;
+                                const startY = (1 - connectionStartFromLine.tValue) ** 3 * p1.y +
+                                    3 * (1 - connectionStartFromLine.tValue) ** 2 * connectionStartFromLine.tValue * p1.y +
+                                    3 * (1 - connectionStartFromLine.tValue) * connectionStartFromLine.tValue ** 2 * p2.y +
+                                    connectionStartFromLine.tValue ** 3 * p2.y;
+
+                                // Store the branch position for later use
+                                connectionStartFromLine.branchX = startX;
+                                connectionStartFromLine.branchY = startY;
+
+                                const endX = mousePos.x;
+                                const endY = mousePos.y;
+                                const newOffset = Math.max(50, Math.abs(endX - startX) * 0.5);
+                                const d = `M ${startX} ${startY} C ${startX + newOffset} ${startY}, ${endX - newOffset} ${endY}, ${endX} ${endY}`;
+                                tempLine.setAttribute('d', d);
+                            }
+                        }
+                    } else {
+                        // Drawing from node connector
+                        const startNode = state.nodes.find(n => n.id === connectionStartNodeId);
+                        if (startNode) {
+                            const startEl = document.getElementById(`node-${startNode.id}`);
+                            if (startEl) {
+                                const startWidth = startEl.offsetWidth;
+                                const startHeight = startEl.offsetHeight;
+
+                                const p1 = {
+                                    x: startNode.x + startWidth,
+                                    y: startNode.y + startHeight / 2
+                                };
+
+                                const endX = mousePos.x;
+                                const endY = mousePos.y;
+                                const offset = Math.max(50, Math.abs(endX - p1.x) * 0.5);
+                                const d = `M ${p1.x} ${p1.y} C ${p1.x + offset} ${p1.y}, ${endX - offset} ${endY}, ${endX} ${endY}`;
+                                tempLine.setAttribute('d', d);
+                            }
+                        }
+                    }
                 }
             }
 
@@ -1400,16 +2099,46 @@
                 }
                 if (isDrawingConnection) {
                     const endConnector = e.target.closest('.node-connector');
-                    if (endConnector) {
+
+                    if (connectionStartFromLine && endConnector) {
+                        // Completing connection from edge point to a node
+                        const endNodeId = parseInt(endConnector.parentElement.id.split('-')[1]);
+                        const conn = state.connections[connectionStartFromLine.connIndex];
+
+                        if (conn.from !== endNodeId && conn.to !== endNodeId) {
+                            // Create a new connection that branches from the existing connection
+                            // Store the branch point coordinates
+                            state.connections.push({
+                                from: conn.from,
+                                to: endNodeId,
+                                connector: conn.connector,
+                                branchPoint: {
+                                    x: connectionStartFromLine.branchX,
+                                    y: connectionStartFromLine.branchY,
+                                    tValue: connectionStartFromLine.tValue,
+                                    originalConnIndex: connectionStartFromLine.connIndex
+                                }
+                            });
+                            saveState();
+                        }
+                    } else if (endConnector) {
+                        // Original connection completion from node to node
                         const endNodeId = parseInt(endConnector.parentElement.id.split('-')[1]);
                         if (connectionStartNodeId !== endNodeId) {
-                            state.connections.push({ from: connectionStartNodeId, to: endNodeId });
+                            state.connections.push({
+                                from: connectionStartNodeId,
+                                to: endNodeId,
+                                connector: connectionStartConnector
+                            });
                             saveState();
                         }
                     }
+
                     if (tempLine) tempLine.remove();
                     isDrawingConnection = false;
                     connectionStartNodeId = null;
+                    connectionStartConnector = null;
+                    connectionStartFromLine = null;
                     tempLine = null;
                     render();
                 }
@@ -1449,7 +2178,6 @@
             function handleKeyDown(e) {
                 if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT') return;
 
-                
                 if (e.ctrlKey || e.metaKey) {
                     if (e.key === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); }
                     if (e.key === 'y') { e.preventDefault(); redo(); }
@@ -1687,14 +2415,24 @@
                     pan.x = mouseX - (mouseX - pan.x) * (scale / oldScale);
                     pan.y = mouseY - (mouseY - pan.y) * (scale / oldScale);
                     applyTransform();
+                    renderConnections(); // Add this line to re-render connections after zoom
                 }, { passive: false });
+
 
                 // UI Buttons
                 undoButton.addEventListener('click', undo);
                 redoButton.addEventListener('click', redo);
-                zoomInButton.addEventListener('click', () => { scale = Math.min(5, scale * 1.2); applyTransform(); });
-                zoomOutButton.addEventListener('click', () => { scale = Math.max(0.1, scale / 1.2); applyTransform(); });
+                zoomInButton.addEventListener('click', () => {
+                    scale = Math.min(5, scale * 1.2);
+                    applyTransform();
+                    renderConnections(); // Add this line
+                });
 
+                zoomOutButton.addEventListener('click', () => {
+                    scale = Math.max(0.1, scale / 1.2);
+                    applyTransform();
+                    renderConnections(); // Add this line
+                });
                 // Initial load
                 loadState();
                 render();
