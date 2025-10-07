@@ -207,8 +207,36 @@
             border-color: #8B5CF6;
         }
 
+        /* Compact start node */
         .node-start {
-            border-color: #22C55E;
+            width: 160px !important;
+            min-height: 100px !important;
+            text-align: center;
+        }
+
+        .node-start .node-field {
+            margin: 2px 0;
+            padding: 2px;
+        }
+
+        .node-start .field-value {
+            font-size: 11px;
+            padding: 3px;
+        }
+
+        .node-start textarea.field-value {
+            min-height: 25px;
+            font-size: 11px;
+        }
+
+        /* Make start node non-draggable */
+        .node-start {
+            cursor: default !important;
+        }
+
+        .node-start:hover {
+            transform: none !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2) !important;
         }
 
         .node-connector {
@@ -1086,15 +1114,6 @@
                 ],
                 control: [
                     {
-                        type: 'start',
-                        name: 'Start',
-                        icon: `<i class="fas fa-play-circle text-green-400 text-xl"></i>`,
-                        category: 'start',
-                        properties: {
-                            description: { type: 'textarea', label: 'Description', value: 'Workflow starting point' }
-                        }
-                    },
-                    {
                         type: 'trigger',
                         name: 'Trigger',
                         icon: `<i class="fas fa-bolt text-orange-400 text-xl"></i>`,
@@ -1252,10 +1271,30 @@
             function loadState() {
                 const savedState = localStorage.getItem('aiWorkflowState');
                 state = savedState ? JSON.parse(savedState) : JSON.parse(JSON.stringify(defaultState));
+
+                // Ensure there's always exactly one start node
+                const startNodes = state.nodes.filter(n => n.type === 'start');
+                if (startNodes.length === 0) {
+                    // Add a start node if none exists
+                    state.nodes.push({
+                        id: nextId++,
+                        x: 100,
+                        y: 150,
+                        type: 'start',
+                        category: 'start',
+                        title: 'Start',
+                        description: 'Workflow starting point',
+                        channel: 'all'
+                    });
+                } else if (startNodes.length > 1) {
+                    // Remove duplicate start nodes, keep only the first one
+                    const firstStartId = startNodes[0].id;
+                    state.nodes = state.nodes.filter(n => n.type !== 'start' || n.id === firstStartId);
+                }
+
                 nextId = (state.nodes.reduce((max, n) => Math.max(max, n.id), 0) || 0) + 1;
                 saveState(true);
             }
-            // #endregion
 
             // #region --- CANVAS TRANSFORMS & UTILS ---
             const screenToCanvasCoords = (x, y) => ({ x: (x - pan.x) / scale, y: (y - pan.y) / scale });
@@ -1276,34 +1315,37 @@
 
             function showDeleteModal(ids) {
                 if (!Array.isArray(ids)) ids = [ids];
-                nodesToDelete = ids.filter(id => state.nodes.find(n => n.id === id));
 
-                if (nodesToDelete.length === 0) return;
-
-                // Check if we're trying to delete the start node
-                const hasStartNode = nodesToDelete.some(id => {
+                // Filter out start nodes from deletion
+                nodesToDelete = ids.filter(id => {
                     const node = state.nodes.find(n => n.id === id);
-                    return node && node.type === 'start';
+                    return node && node.type !== 'start';
                 });
 
-                if (hasStartNode && nodesToDelete.length > 1) {
-                    deleteModalTitle.textContent = 'Cannot Delete Start Node';
-                    deleteModalBody.textContent = 'You cannot delete the start node along with other nodes. Please select only non-start nodes to delete.';
-                    confirmDelete.disabled = true;
-                } else if (hasStartNode) {
-                    deleteModalTitle.textContent = 'Delete Start Node';
-                    deleteModalBody.textContent = 'Are you sure you want to delete the start node? This will remove the entry point of your workflow.';
-                    confirmDelete.disabled = false;
-                } else {
-                    if (nodesToDelete.length > 1) {
-                        deleteModalTitle.textContent = `Delete ${nodesToDelete.length} Nodes`;
-                        deleteModalBody.textContent = `Are you sure you want to delete these ${nodesToDelete.length} nodes? This action cannot be undone.`;
-                    } else {
-                        deleteModalTitle.textContent = 'Delete Node';
-                        deleteModalBody.textContent = 'Are you sure you want to delete this node? This action cannot be undone.';
+                if (nodesToDelete.length === 0) {
+                    // If only start node was selected, show message and return
+                    if (ids.some(id => {
+                        const node = state.nodes.find(n => n.id === id);
+                        return node && node.type === 'start';
+                    })) {
+                        deleteModalTitle.textContent = 'Cannot Delete Start Node';
+                        deleteModalBody.textContent = 'The start node cannot be deleted as it is the entry point of your workflow.';
+                        confirmDelete.disabled = true;
+                        deleteModal.style.display = 'flex';
+                        return;
                     }
-                    confirmDelete.disabled = false;
+                    return;
                 }
+
+                // Rest of the function remains the same for non-start nodes
+                if (nodesToDelete.length > 1) {
+                    deleteModalTitle.textContent = `Delete ${nodesToDelete.length} Nodes`;
+                    deleteModalBody.textContent = `Are you sure you want to delete these ${nodesToDelete.length} nodes? This action cannot be undone.`;
+                } else {
+                    deleteModalTitle.textContent = 'Delete Node';
+                    deleteModalBody.textContent = 'Are you sure you want to delete this node? This action cannot be undone.';
+                }
+                confirmDelete.disabled = false;
                 deleteModal.style.display = 'flex';
             }
 
@@ -1336,54 +1378,80 @@
                 const nodeDef = Object.values(nodeTypes).flat().find(n => n.type === node.type);
                 const icon = nodeDef?.icon || `<i class="fas fa-cube text-gray-400 text-xl"></i>`;
 
-                let content = `
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center space-x-3">
-                            ${icon}
-                            <div>
-                                <h3 class="font-bold text-md" contenteditable="true" data-field="title" data-node-id="${node.id}">${node.title}</h3>
-                                <p class="text-xs text-gray-400">${nodeDef?.name || node.type}</p>
-                            </div>
-                        </div>
+                // Special compact layout for start node - no delete button, smaller size
+                if (node.type === 'start') {
+                    return `
+            <div class="flex flex-col items-center justify-center h-full p-3">
+                <div class="flex items-center space-x-2 mb-2">
+                    <i class="fas fa-play-circle text-green-400 text-2xl"></i>
+                    <div class="text-center">
+                        <h3 class="font-bold text-sm">${node.title}</h3>
+                        <p class="text-xs text-gray-400">Workflow Start</p>
                     </div>
-                `;
+                </div>
+                <div class="text-xs text-gray-400 text-center mt-1">
+                    Entry Point
+                </div>
+            </div>
+        `;
+                }
+
+                let content = `
+        <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center space-x-3">
+                ${icon}
+                <div>
+                    <h3 class="font-bold text-md" contenteditable="true" data-field="title" data-node-id="${node.id}">${node.title}</h3>
+                    <p class="text-xs text-gray-400">${nodeDef?.name || node.type}</p>
+                </div>
+            </div>
+        </div>
+    `;
 
                 if (node.type !== 'start') {
                     content += `<select class="channel-selector" data-node-id="${node.id}">
-                        ${getChannelOptions(node.channel)}
-                    </select>`;
+            ${getChannelOptions(node.channel)}
+        </select>`;
                 }
 
-                // Special layout for conversation node
+                // Updated two-column layout for conversation node
                 if (node.type === 'conversation') {
                     content += `
-                        <div class="conversation-layout">
-                            <div class="conversation-vertical">
-                                <div class="node-field">
-                                    <label>Purpose</label>
-                                    <textarea class="field-value" data-node-id="${node.id}" data-field="purpose" placeholder="Purpose">${node.purpose || nodeDef?.properties.purpose.value || ''}</textarea>
-                                </div>
-                                <div class="node-field">
-                                    <label>Context</label>
-                                    <textarea class="field-value" data-node-id="${node.id}" data-field="context" placeholder="Context">${node.context || nodeDef?.properties.context.value || ''}</textarea>
-                                </div>
-                                <div class="node-field">
-                                    <label>Data Extraction</label>
-                                    <textarea class="field-value" data-node-id="${node.id}" data-field="dataExtraction" placeholder="Data Extraction">${node.dataExtraction || nodeDef?.properties.dataExtraction.value || ''}</textarea>
-                                </div>
-                            </div>
-                            <div class="conversation-horizontal">
-                                <div class="node-field">
-                                    <label>Data Output</label>
-                                    <input type="text" class="field-value" data-node-id="${node.id}" data-field="dataOutput" value="${node.dataOutput || nodeDef?.properties.dataOutput.value || ''}" placeholder="Data Output">
-                                </div>
-                                <div class="node-field">
-                                    <label>Advanced Settings</label>
-                                    <textarea class="field-value" data-node-id="${node.id}" data-field="advancedSettings" placeholder="Advanced Settings">${node.advancedSettings || nodeDef?.properties.advancedSettings.value || ''}</textarea>
-                                </div>
-                            </div>
-                        </div>
-                    `;
+            <div class="flex gap-3 mt-3">
+                <!-- Left Column - 3 fields stacked -->
+                <div class="flex-1 flex flex-col gap-2">
+                    <div class="node-field">
+                        <label>Purpose</label>
+                        <textarea class="field-value" data-node-id="${node.id}" data-field="purpose" placeholder="Purpose">${node.purpose || nodeDef?.properties.purpose.value || ''}</textarea>
+                    </div>
+                    <div class="node-field">
+                        <label>Context</label>
+                        <textarea class="field-value" data-node-id="${node.id}" data-field="context" placeholder="Context">${node.context || nodeDef?.properties.context.value || ''}</textarea>
+                    </div>
+                    <div class="node-field">
+                        <label>Data Extraction</label>
+                        <textarea class="field-value" data-node-id="${node.id}" data-field="dataExtraction" placeholder="Data Extraction">${node.dataExtraction || nodeDef?.properties.dataExtraction.value || ''}</textarea>
+                    </div>
+                </div>
+                
+                <!-- Right Column - 2 fields stacked -->
+                <div class="flex-1 flex flex-col gap-2">
+                    <div class="node-field h-full">
+                        <label>Data Output</label>
+                        <textarea class="field-value h-full min-h-[100px]" data-node-id="${node.id}" data-field="dataOutput" placeholder="Data Output">${node.dataOutput || nodeDef?.properties.dataOutput.value || ''}</textarea>
+                    </div>
+                    <div class="node-field">
+                        <label>Advanced Settings</label>
+                        <select class="field-value" data-node-id="${node.id}" data-field="advancedSettings">
+                            <option value="default" ${(node.advancedSettings || nodeDef?.properties.advancedSettings.value || '') === 'default' ? 'selected' : ''}>Default Settings</option>
+                            <option value="custom" ${(node.advancedSettings || nodeDef?.properties.advancedSettings.value || '') === 'custom' ? 'selected' : ''}>Custom Settings</option>
+                            <option value="optimized" ${(node.advancedSettings || nodeDef?.properties.advancedSettings.value || '') === 'optimized' ? 'selected' : ''}>Optimized</option>
+                            <option value="minimal" ${(node.advancedSettings || nodeDef?.properties.advancedSettings.value || '') === 'minimal' ? 'selected' : ''}>Minimal</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        `;
                 } else if (nodeDef?.properties) {
                     Object.keys(nodeDef.properties).forEach(propKey => {
                         const prop = nodeDef.properties[propKey];
@@ -1401,14 +1469,14 @@
                             fieldContent += `</select>`;
                         } else if (prop.type === 'boolean') {
                             fieldContent = `
-                                <div class="toggle-switch">
-                                    <span>${prop.label}</span>
-                                    <label class="switch">
-                                        <input type="checkbox" class="field-value" data-node-id="${node.id}" data-field="${propKey}" ${value ? 'checked' : ''}>
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
-                            `;
+                    <div class="toggle-switch">
+                        <span>${prop.label}</span>
+                        <label class="switch">
+                            <input type="checkbox" class="field-value" data-node-id="${node.id}" data-field="${propKey}" ${value ? 'checked' : ''}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                `;
                         } else if (prop.type === 'date') {
                             fieldContent = `<input type="text" class="field-value calendar-picker" data-node-id="${node.id}" data-field="${propKey}" value="${value}" placeholder="${prop.label}">`;
                         } else {
@@ -1416,53 +1484,54 @@
                         }
 
                         content += `
-                            <div class="node-field">
-                                ${prop.type !== 'boolean' ? `<label>${prop.label}</label>` : ''}
-                                ${fieldContent}
-                            </div>
-                        `;
+                <div class="node-field">
+                    ${prop.type !== 'boolean' ? `<label>${prop.label}</label>` : ''}
+                    ${fieldContent}
+                </div>
+            `;
                     });
                 }
 
                 // Add connection points for path conditions node
                 if (node.type === 'path_conditions') {
                     content += `
-        <div class="connection-point-container">
-            <div class="connection-point">
-                <div class="connection-point-label">Yes</div>
-                <div class="connection-point-dot" data-connector="yes"></div>
+            <div class="connection-point-container">
+                <div class="connection-point">
+                    <div class="connection-point-label">Yes</div>
+                    <div class="connection-point-dot" data-connector="yes"></div>
+                </div>
+                <div class="connection-point">
+                    <div class="connection-point-label">No</div>
+                    <div class="connection-point-dot" data-connector="no"></div>
+                </div>
             </div>
-            <div class="connection-point">
-                <div class="connection-point-label">No</div>
-                <div class="connection-point-dot" data-connector="no"></div>
-            </div>
-        </div>
-    `;
+        `;
                 }
 
                 // Add tags section for edit_tags node
                 if (node.type === 'edit_tags') {
                     content += `
-                        <div class="tags-section">
-                            <div class="flex items-center justify-between">
-                                <label>Tags</label>
-                                <button class="add-tag-btn">+ Add Tag</button>
-                            </div>
-                            <div class="tags-list" data-node-id="${node.id}">
-                                ${renderTags(node.tags || [])}
-                            </div>
-                        </div>
-                    `;
+            <div class="tags-section">
+                <div class="flex items-center justify-between">
+                    <label>Tags</label>
+                    <button class="add-tag-btn">+ Add Tag</button>
+                </div>
+                <div class="tags-list" data-node-id="${node.id}">
+                    ${renderTags(node.tags || [])}
+                </div>
+            </div>
+        `;
                 }
 
-                // MODIFICATION: Add delete button for ALL nodes including start node
-                content += `
-                    <button data-delete-id="${node.id}" class="delete-node-button absolute -top-2 -right-2 w-6 h-6 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center text-white text-sm transition-all" title="Delete Node">&times;</button>
-                `;
+                // Only add delete button for NON-START nodes
+                if (node.type !== 'start') {
+                    content += `
+            <button data-delete-id="${node.id}" class="delete-node-button absolute -top-2 -right-2 w-6 h-6 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center text-white text-sm transition-all" title="Delete Node">&times;</button>
+        `;
+                }
 
                 return content;
             }
-
             function renderTags(tags) {
                 if (!tags || tags.length === 0) {
                     return '<div class="text-xs text-gray-500 mt-2">No tags added</div>';
@@ -1914,9 +1983,12 @@
                 if (selectedNodeIds.size === 0) return;
                 const newNodes = [];
                 const idMap = new Map();
+
                 selectedNodeIds.forEach(id => {
                     const oldNode = state.nodes.find(n => n.id === id);
+                    // Skip start nodes and any other nodes that shouldn't be duplicated
                     if (oldNode.type === 'start') return;
+
                     const newNode = JSON.parse(JSON.stringify(oldNode));
                     newNode.id = nextId++;
                     newNode.x += GRID_SIZE * 2;
@@ -1924,17 +1996,19 @@
                     newNodes.push(newNode);
                     idMap.set(id, newNode.id);
                 });
+
+                if (newNodes.length === 0) return;
+
                 state.nodes.push(...newNodes);
                 selectedNodeIds.clear();
                 newNodes.forEach(n => selectedNodeIds.add(n.id));
                 saveState();
                 render();
             }
-
             function copySelectedNodes() {
-                clipboard = state.nodes.filter(n => selectedNodeIds.has(n.id)).map(n => JSON.parse(JSON.stringify(n)));
+                clipboard = state.nodes.filter(n => selectedNodeIds.has(n.id) && n.type !== 'start')
+                    .map(n => JSON.parse(JSON.stringify(n)));
             }
-
             function pasteNodes(x, y) {
                 if (clipboard.length === 0) return;
                 const newNodes = [];
@@ -2236,11 +2310,32 @@
                         selectedNodeIds.add(nodeId);
                         render();
                     }
+
+                    const hasStartNode = Array.from(selectedNodeIds).some(id => {
+                        const node = state.nodes.find(n => n.id === id);
+                        return node && node.type === 'start';
+                    });
+
                     items = [
-                        { label: 'Duplicate', action: duplicateSelectedNodes, key: 'Ctrl+D', disabled: selectedNodeIds.size === 0 },
-                        { label: 'Copy', action: copySelectedNodes, key: 'Ctrl+C', disabled: selectedNodeIds.size === 0 },
+                        {
+                            label: 'Duplicate',
+                            action: duplicateSelectedNodes,
+                            key: 'Ctrl+D',
+                            disabled: selectedNodeIds.size === 0 || hasStartNode
+                        },
+                        {
+                            label: 'Copy',
+                            action: copySelectedNodes,
+                            key: 'Ctrl+C',
+                            disabled: selectedNodeIds.size === 0 || hasStartNode
+                        },
                         { type: 'separator' },
-                        { label: 'Delete', action: deleteSelectedNodes, key: 'Del', disabled: selectedNodeIds.size === 0 }
+                        {
+                            label: 'Delete',
+                            action: deleteSelectedNodes,
+                            key: 'Del',
+                            disabled: selectedNodeIds.size === 0 || hasStartNode
+                        }
                     ];
                 } else {
                     items = [
@@ -2249,6 +2344,7 @@
                         { label: 'Paste', action: () => pasteNodes(mousePos.x, mousePos.y), key: 'Ctrl+V', disabled: clipboard.length === 0 }
                     ];
                 }
+
 
                 contextMenu.innerHTML = items.map(item => {
                     if (item.type === 'separator') return `<div class="context-menu-separator"></div>`;
