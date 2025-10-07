@@ -1083,9 +1083,24 @@
                         icon: `<i class="fas fa-envelope text-blue-400 text-xl"></i>`,
                         category: 'communication',
                         properties: {
-                            content: { type: 'textarea', label: 'Content', value: 'Hello! How can I help you?' },
-                            attachments: { type: 'text', label: 'Attachments', value: 'None' },
-                            description: { type: 'textarea', label: 'Description', value: 'Message configuration' }
+                            mode: {
+                                type: 'select',
+                                label: 'Mode',
+                                value: 'prompt',
+                                options: ['prompt', 'static']
+                            },
+                            content: {
+                                type: 'textarea',
+                                label: 'Content',
+                                value: 'Hello! How can I help you?',
+                                allowVariables: true  // 👈 enables variable insertion
+                            },
+                            variables: {
+                                type: 'multi-select',
+                                label: 'Insert Variables',
+                                options: ['{{user_name}}', '{{date}}', '{{time}}', '{{email}}'],
+                                value: []
+                            }
                         }
                     },
                     {
@@ -1095,7 +1110,6 @@
                         category: 'communication',
                         properties: {
                             duration: { type: 'text', label: 'Duration', value: '30 minutes' },
-                            participants: { type: 'text', label: 'Participants', value: 'user, agent' },
                             description: { type: 'textarea', label: 'Description', value: 'Call settings' }
                         }
                     },
@@ -1119,14 +1133,8 @@
                         icon: `<i class="fas fa-bolt text-orange-400 text-xl"></i>`,
                         category: 'control',
                         properties: {
-                            eventType: {
-                                type: 'select',
-                                label: 'Event Type',
-                                value: 'message_received',
-                                options: ['message_received', 'webhook', 'schedule', 'api_call']
-                            },
-                            conditions: { type: 'textarea', label: 'Conditions', value: 'Trigger conditions' },
-                            description: { type: 'textarea', label: 'Description', value: 'Trigger configuration' }
+                            triggerPhrase: { type: 'text', label: 'Trigger Phrase', value: '' },
+                            description: { type: 'textarea', label: 'Description', value: '' }
                         }
                     },
                     {
@@ -1145,9 +1153,7 @@
                         icon: `<i class="fas fa-stop-circle text-orange-400 text-xl"></i>`,
                         category: 'control',
                         properties: {
-                            reason: { type: 'text', label: 'Reason', value: 'Process completed' },
-                            notify: { type: 'checkbox', label: 'Notify Users', value: true },
-                            description: { type: 'textarea', label: 'Description', value: 'Stop workflow execution' }
+                            label: { type: 'static', value: 'Stop Process' }
                         }
                     },
                     {
@@ -1156,9 +1162,13 @@
                         icon: `<i class="fas fa-hourglass-half text-orange-400 text-xl"></i>`,
                         category: 'control',
                         properties: {
-                            time: { type: 'text', label: 'Time', value: '5 minutes' },
-                            condition: { type: 'textarea', label: 'Condition', value: 'Wait for user response' },
-                            description: { type: 'textarea', label: 'Description', value: 'Wait configuration' }
+                            duration: { type: 'number', label: 'Duration', value: 5 },
+                            unit: {
+                                type: 'select',
+                                label: 'Unit',
+                                options: ['Seconds', 'Minutes', 'Hours'],
+                                value: 'Minutes'
+                            }
                         }
                     },
                     {
@@ -1226,20 +1236,40 @@
                         }
                     },
                     {
-                        type: 'edit_tags',
-                        name: 'Edit Tags',
-                        icon: `<i class="fas fa-tags text-purple-400 text-xl"></i>`,
-                        category: 'ai',
-                        properties: {
-                            tagsList: { type: 'textarea', label: 'Tags List', value: 'important, follow-up, completed' },
-                            color: { type: 'color', label: 'Color', value: '#3B82F6' },
-                            priority: {
-                                type: 'select',
-                                label: 'Priority',
-                                value: 'medium',
-                                options: ['low', 'medium', 'high', 'critical']
+                        "type": "edit_tags",
+                        "name": "Edit Tags",
+                        "icon": "<i class='fas fa-tags text-green-500 text-xl'></i>",
+                        "category": "ai",
+                        "properties": {
+                            "action": {
+                                "type": "select",
+                                "label": "Action",
+                                "value": "Remove Tags",
+                                "options": [
+                                    "Add Tags",
+                                    "Remove Tags"
+                                ]
                             },
-                            description: { type: 'textarea', label: 'Description', value: 'Tag management settings' }
+                            "tags_to_add": {
+                                "type": "tags-input",
+                                "label": "Add Tags:",
+                                "placeholder": "Select tags to add...",
+                                "value": [],
+                                "displayCondition": {
+                                    "property": "action",
+                                    "value": "Add Tags"
+                                }
+                            },
+                            "tags_to_remove": {
+                                "type": "tags-input",
+                                "label": "Remove Tags:",
+                                "placeholder": "Select tags to remove...",
+                                "value": [],
+                                "displayCondition": {
+                                    "property": "action",
+                                    "value": "Remove Tags"
+                                }
+                            }
                         }
                     }
                 ]
