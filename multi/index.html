@@ -1146,6 +1146,62 @@
             background-color: #8b5cf6;
         }
 
+        /* Update hamburger menu and sidebar toggle for light theme */
+        [data-theme="light"] .toggle-panel {
+            background: #e2e8f0 !important;
+            color: #1e293b !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+
+        [data-theme="light"] .toggle-panel:hover {
+            background: #cbd5e1 !important;
+            border-color: #94a3b8 !important;
+        }
+
+        [data-theme="light"] .panel-header {
+            background: #f8fafc !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+
+        [data-theme="light"] .panel-header h3 {
+            color: #1e293b !important;
+        }
+
+        /* Update the collapsed sidebar state */
+        [data-theme="light"] .node-panel.collapsed {
+            background: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+
+        [data-theme="light"] .node-panel.collapsed .toggle-panel {
+            background: #e2e8f0 !important;
+            color: #1e293b !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+
+        [data-theme="light"] .node-panel.collapsed .toggle-panel:hover {
+            background: #cbd5e1 !important;
+            border-color: #94a3b8 !important;
+        }
+
+        /* Update hamburger icon color */
+        [data-theme="light"] .toggle-panel i {
+            color: #1e293b !important;
+        }
+
+        [data-theme="light"] .toggle-panel:hover i {
+            color: #1e293b !important;
+        }
+
+        /* Override any specific icon colors */
+        [data-theme="light"] .fa-bars {
+            color: #1e293b !important;
+        }
+
+        [data-theme="light"] .fa-chevron-right {
+            color: #1e293b !important;
+        }
+
         .add-tag-btn:hover {
             background: #9333ea;
         }
@@ -1334,6 +1390,7 @@
             const GRID_SIZE = 20;
             let currentTheme = localStorage.getItem('theme') || 'dark';
             // Add this to your toggleTheme function
+            // Add this to your toggleTheme function
             function toggleTheme() {
                 currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
                 document.documentElement.setAttribute('data-theme', currentTheme);
@@ -1349,13 +1406,19 @@
                     themeIcon.title = 'Switch to Dark Mode';
                 }
 
-                // Force re-render of node panel items
-                const pickerNodes = document.querySelectorAll('.picker-node');
-                pickerNodes.forEach(node => {
-                    node.style.backgroundColor = currentTheme === 'light' ? '#f8fafc' : '#2a2a2a';
-                    node.style.color = currentTheme === 'light' ? '#1e293b' : '#ffffff';
-                    node.style.borderColor = currentTheme === 'light' ? '#e2e8f0' : 'transparent';
-                });
+                // Force update sidebar toggle button
+                const togglePanel = document.querySelector('#toggle-panel');
+                if (togglePanel) {
+                    if (currentTheme === 'light') {
+                        togglePanel.style.backgroundColor = '#e2e8f0';
+                        togglePanel.style.color = '#1e293b';
+                        togglePanel.style.borderColor = '#cbd5e1';
+                    } else {
+                        togglePanel.style.backgroundColor = '#2a2a2a';
+                        togglePanel.style.color = '#ffffff';
+                        togglePanel.style.borderColor = '#444';
+                    }
+                }
 
                 // Re-render to update connections and nodes
                 render();
