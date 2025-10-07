@@ -863,6 +863,131 @@
             margin-top: 8px;
         }
 
+        /* Light Theme Variables */
+        [data-theme="light"] {
+            --bg-color: #f8fafc;
+            --node-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --brand-color: #8b5cf6;
+            --brand-color-light: rgba(139, 92, 246, 0.1);
+            --red-color: #ef4444;
+            --green-color: #22c55e;
+            --blue-color: #3b82f6;
+            --orange-color: #f59e0b;
+            --purple-color: #8b5cf6;
+        }
+
+        /* Dark Theme Variables (default) */
+        [data-theme="dark"] {
+            --bg-color: #111111;
+            --node-bg: #1E1E1E;
+            --border-color: #444;
+            --text-color: #ffffff;
+            --text-muted: #9CA3AF;
+            --brand-color: #A855F7;
+            --brand-color-light: rgba(168, 85, 247, 0.3);
+            --red-color: #EF4444;
+            --green-color: #22C55E;
+            --blue-color: #3B82F6;
+            --orange-color: #F59E0B;
+            --purple-color: #8B5CF6;
+        }
+
+        /* Update body to use data-theme */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Update workflow canvas */
+        .workflow-canvas {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 0);
+            background-size: 20px 20px;
+            background-position: center;
+            cursor: grab;
+            transition: background-color 0.3s ease;
+        }
+
+        [data-theme="light"] .workflow-canvas {
+            background-image: radial-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 0);
+        }
+
+        /* Update node styling */
+        .node {
+            background-color: var(--node-bg);
+            border: 2px solid;
+            transition: all 0.3s ease;
+        }
+
+        /* Update node panel and channel bar */
+        .node-panel,
+        .channel-bar {
+            background: var(--node-bg);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        /* Update control buttons */
+        .control-button {
+            background-color: var(--node-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        /* Update modal */
+        .modal-content {
+            background: var(--node-bg);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        /* Update context menu */
+        #context-menu {
+            background-color: var(--node-bg);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        /* Update node fields */
+        .node-field {
+            background: rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] .node-field {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Update select elements */
+        .channel-selector,
+        .field-value[type="select"] {
+            background: var(--node-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        /* Update toggle switch */
+        .toggle-switch .slider {
+            background-color: var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        /* Update calendar picker */
+        .calendar-picker {
+            color: var(--text-color);
+            background: var(--node-bg);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
         .add-tag-btn:hover {
             background: #9333ea;
         }
@@ -884,6 +1009,23 @@
     </div>
 
     <div id="context-menu" class="hidden"></div>
+    <div class="absolute bottom-4 left-4 flex space-x-2 z-10" style="margin-left: 320px;">
+        <button id="undo-button" class="control-button w-12 h-12 rounded-xl flex items-center justify-center shadow-lg"
+            title="Undo (Ctrl+Z)"><i class="fas fa-undo"></i></button>
+        <button id="redo-button" class="control-button w-12 h-12 rounded-xl flex items-center justify-center shadow-lg"
+            title="Redo (Ctrl+Y)"><i class="fas fa-redo"></i></button>
+        <button id="zoom-in-button"
+            class="control-button w-12 h-12 rounded-xl flex items-center justify-center shadow-lg" title="Zoom In"><i
+                class="fas fa-search-plus"></i></button>
+        <button id="zoom-out-button"
+            class="control-button w-12 h-12 rounded-xl flex items-center justify-center shadow-lg" title="Zoom Out"><i
+                class="fas fa-search-minus"></i></button>
+        <!-- Add theme toggle button -->
+        <button id="theme-toggle" class="control-button w-12 h-12 rounded-xl flex items-center justify-center shadow-lg"
+            title="Toggle Theme">
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
 
     <div id="node-panel" class="node-panel">
         <div class="panel-header">
@@ -1032,6 +1174,26 @@
             let selectionStart = { x: 0, y: 0 };
             let contextMenuCoords = { x: 0, y: 0 };
             const GRID_SIZE = 20;
+            let currentTheme = localStorage.getItem('theme') || 'dark';
+            // Theme toggle function
+            function toggleTheme() {
+                currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', currentTheme);
+                localStorage.setItem('theme', currentTheme);
+
+                // Update the theme toggle icon
+                const themeIcon = document.querySelector('#theme-toggle i');
+                if (currentTheme === 'dark') {
+                    themeIcon.className = 'fas fa-moon';
+                    themeIcon.title = 'Switch to Light Mode';
+                } else {
+                    themeIcon.className = 'fas fa-sun';
+                    themeIcon.title = 'Switch to Dark Mode';
+                }
+
+                // Re-render to update connections and nodes
+                render();
+            }
 
             const defaultState = {
                 nodes: [
@@ -1842,15 +2004,15 @@
                     }
 
                     // Initialize calendar picker for booking nodes
+                    // Initialize calendar picker for booking nodes
                     const calendarPicker = el.querySelector('.calendar-picker');
                     if (calendarPicker) {
                         flatpickr(calendarPicker, {
                             dateFormat: "Y-m-d",
                             allowInput: true,
-                            theme: "dark"
+                            theme: currentTheme // Use current theme
                         });
                     }
-
                     // Handle add tag button for edit_tags nodes
                     const addTagBtn = el.querySelector('.add-tag-btn');
                     if (addTagBtn) {
@@ -2520,6 +2682,21 @@
                 setupNodePanel();
                 setupChannelBar();
                 setupModal();
+                // Initialize theme
+                document.documentElement.setAttribute('data-theme', currentTheme);
+
+                // Set initial theme icon
+                const themeIcon = document.querySelector('#theme-toggle i');
+                if (currentTheme === 'dark') {
+                    themeIcon.className = 'fas fa-moon';
+                    themeIcon.title = 'Switch to Light Mode';
+                } else {
+                    themeIcon.className = 'fas fa-sun';
+                    themeIcon.title = 'Switch to Dark Mode';
+                }
+
+                // Add theme toggle event listener
+                document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
 
                 svgCanvas.addEventListener('mousedown', e => {
                     if (e.target.classList.contains('connection-delete-button')) {
