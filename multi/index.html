@@ -955,6 +955,80 @@
             transition: all 0.3s ease;
         }
 
+        /* Update category nodes in the left panel for light theme */
+        [data-theme="light"] .category-nodes {
+            background: transparent;
+        }
+
+        [data-theme="light"] .picker-node {
+            background-color: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #1e293b !important;
+        }
+
+        [data-theme="light"] .picker-node:hover {
+            background-color: #e2e8f0 !important;
+            border-color: #cbd5e1 !important;
+            color: #1e293b !important;
+        }
+
+        [data-theme="light"] .picker-node i {
+            color: #1e293b !important;
+        }
+
+        [data-theme="light"] .picker-node span {
+            color: #1e293b !important;
+        }
+
+        /* Update the entire node panel content area */
+        [data-theme="light"] .node-panel {
+            background: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+
+        [data-theme="light"] .node-panel-content {
+            background: #f8fafc !important;
+        }
+
+        [data-theme="light"] .category-section {
+            background: transparent !important;
+        }
+
+        [data-theme="light"] .category-header {
+            color: #1e293b !important;
+            border-bottom-color: #e2e8f0 !important;
+            background: transparent !important;
+        }
+
+        [data-theme="light"] .category-header:hover {
+            color: #8b5cf6 !important;
+            background: transparent !important;
+        }
+
+        [data-theme="light"] .category-header i {
+            color: #1e293b !important;
+        }
+
+        [data-theme="light"] .category-header:hover i {
+            color: #8b5cf6 !important;
+        }
+
+        /* More specific selectors for node panel items */
+        [data-theme="light"] #communication-nodes .picker-node,
+        [data-theme="light"] #control-nodes .picker-node,
+        [data-theme="light"] #ai-nodes .picker-node {
+            background-color: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #1e293b !important;
+        }
+
+        [data-theme="light"] #communication-nodes .picker-node:hover,
+        [data-theme="light"] #control-nodes .picker-node:hover,
+        [data-theme="light"] #ai-nodes .picker-node:hover {
+            background-color: #e2e8f0 !important;
+            border-color: #cbd5e1 !important;
+        }
+
         /* Update node fields */
         .node-field {
             background: rgba(0, 0, 0, 0.05);
@@ -1259,7 +1333,7 @@
             let contextMenuCoords = { x: 0, y: 0 };
             const GRID_SIZE = 20;
             let currentTheme = localStorage.getItem('theme') || 'dark';
-            // Theme toggle function
+            // Add this to your toggleTheme function
             function toggleTheme() {
                 currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
                 document.documentElement.setAttribute('data-theme', currentTheme);
@@ -1274,6 +1348,14 @@
                     themeIcon.className = 'fas fa-sun';
                     themeIcon.title = 'Switch to Dark Mode';
                 }
+
+                // Force re-render of node panel items
+                const pickerNodes = document.querySelectorAll('.picker-node');
+                pickerNodes.forEach(node => {
+                    node.style.backgroundColor = currentTheme === 'light' ? '#f8fafc' : '#2a2a2a';
+                    node.style.color = currentTheme === 'light' ? '#1e293b' : '#ffffff';
+                    node.style.borderColor = currentTheme === 'light' ? '#e2e8f0' : 'transparent';
+                });
 
                 // Re-render to update connections and nodes
                 render();
