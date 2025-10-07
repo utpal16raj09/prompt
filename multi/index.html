@@ -988,6 +988,90 @@
             transition: all 0.3s ease;
         }
 
+        /* Update channel bar for light theme */
+        [data-theme="light"] .channel-button {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
+        }
+
+        [data-theme="light"] .channel-button:hover {
+            background-color: #e2e8f0;
+        }
+
+        [data-theme="light"] .channel-button.active {
+            background-color: rgba(139, 92, 246, 0.1);
+            border-color: #8b5cf6;
+        }
+
+        [data-theme="light"] .toggle-channels {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        [data-theme="light"] .toggle-channels:hover {
+            background: #cbd5e1;
+        }
+
+        /* Update minimap for light theme */
+        [data-theme="light"] #minimap {
+            background-color: rgba(248, 250, 252, 0.8);
+            border: 1px solid #e2e8f0;
+        }
+
+        [data-theme="light"] .minimap-node {
+            background-color: #64748b;
+        }
+
+        [data-theme="light"] .minimap-node.selected {
+            background-color: #8b5cf6;
+        }
+
+        [data-theme="light"] #minimap-viewport {
+            border: 1px solid #8b5cf6;
+            background-color: rgba(139, 92, 246, 0.1);
+        }
+
+        /* Update modal for light theme */
+        [data-theme="light"] .modal-button.cancel {
+            background: #e2e8f0;
+            color: #1e293b;
+            border: 1px solid #cbd5e1;
+        }
+
+        [data-theme="light"] .modal-button.cancel:hover {
+            background: #cbd5e1;
+        }
+
+        /* Update context menu for light theme */
+        [data-theme="light"] #context-menu {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
+        }
+
+        [data-theme="light"] .context-menu-item:not(.disabled):hover {
+            background-color: #8b5cf6;
+            color: #ffffff;
+        }
+
+        [data-theme="light"] .context-menu-item.disabled {
+            color: #94a3b8;
+        }
+
+        [data-theme="light"] .context-menu-separator {
+            background-color: #e2e8f0;
+        }
+
+        /* Update toggle switch for light theme */
+        [data-theme="light"] .toggle-switch .slider {
+            background-color: #cbd5e1;
+        }
+
+        [data-theme="light"] .toggle-switch input:checked+.slider {
+            background-color: #8b5cf6;
+        }
+
         .add-tag-btn:hover {
             background: #9333ea;
         }
