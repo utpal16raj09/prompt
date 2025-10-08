@@ -1242,55 +1242,19 @@
         </div>
     </div>
     <div id="path-condition-modal" class="modal">
-        <div class="modal-content" style="max-width: 500px;">
-            <h3 class="text-lg font-semibold mb-4">Path Conditions</h3>
-            <div class="space-y-4">
-                <div class="node-field">
-                    <label>Condition Type</label>
-                    <select id="condition-type" class="field-value">
-                        <option value="data">Data Condition</option>
-                        <option value="channel">Channel Condition</option>
-                        <option value="custom">Custom Condition</option>
-                    </select>
-                </div>
-                <div id="data-condition-section" class="node-field">
-                    <label>Data Field</label>
-                    <input type="text" id="data-field" class="field-value" placeholder="e.g., user.tag">
-                </div>
-                <div id="data-operator-section" class="node-field">
-                    <label>Operator</label>
-                    <select id="data-operator" class="field-value">
-                        <option value="equals">Equals</option>
-                        <option value="contains">Contains</option>
-                        <option value="greater_than">Greater Than</option>
-                        <option value="less_than">Less Than</option>
-                        <option value="not_equals">Not Equals</option>
-                    </select>
-                </div>
-                <div id="data-value-section" class="node-field">
-                    <label>Value</label>
-                    <input type="text" id="data-value" class="field-value" placeholder="e.g., premium">
-                </div>
-                <div id="channel-condition-section" class="node-field hidden">
-                    <label>Channel</label>
-                    <select id="channel-value" class="field-value">
-                        <option value="whatsapp">WhatsApp</option>
-                        <option value="instagram">Instagram</option>
-                        <option value="facebook">Facebook</option>
-                        <option value="telegram">Telegram</option>
-                        <option value="email">Email</option>
-                        <option value="sms">SMS</option>
-                        <option value="call">Call</option>
-                    </select>
-                </div>
-                <div id="custom-condition-section" class="node-field hidden">
-                    <label>Custom Condition</label>
-                    <textarea id="custom-condition" class="field-value" placeholder="e.g., user.tag == 'premium' AND channel == 'whatsapp'"></textarea>
-                </div>
-            </div>
+        <div class="modal-content">
+            <h3 class="text-lg font-semibold mb-2">Set Path Condition</h3>
+            <p class="text-gray-400 mb-4">
+                Define the condition that must be met for the workflow to proceed down this path. Leave blank for an
+                unconditional path.
+            </p>
+            <textarea id="path-condition-input"
+                class="w-full h-24 p-2 rounded bg-[#2a2a2a] border border-gray-600 text-white focus:outline-none focus:border-purple-500"
+                placeholder="e.g., user.tag == 'premium'"></textarea>
             <div class="modal-buttons">
                 <button id="cancel-condition" class="modal-button cancel">Cancel</button>
-                <button id="save-condition" class="modal-button" style="background-color: var(--brand-color);">Save Condition</button>
+                <button id="save-condition" class="modal-button"
+                    style="background-color: var(--brand-color);">Save</button>
             </div>
         </div>
     </div>
@@ -1382,10 +1346,6 @@
                 <i class="fas fa-comment-alt text-lg mb-1" style="color: #34B7F1;"></i>
                 <span class="text-xs">SMS</span>
             </div>
-            <div class="channel-button" data-channel="call">
-                <i class="fas fa-phone text-lg mb-1" style="color: #10B981;"></i>
-                <span class="text-xs">Call</span>
-            </div>
         </div>
     </div>
 
@@ -1445,17 +1405,7 @@
             const pathConditionModal = document.getElementById('path-condition-modal');
             const saveConditionButton = document.getElementById('save-condition');
             const cancelConditionButton = document.getElementById('cancel-condition');
-            const conditionTypeSelect = document.getElementById('condition-type');
-            const dataConditionSection = document.getElementById('data-condition-section');
-            const dataOperatorSection = document.getElementById('data-operator-section');
-            const dataValueSection = document.getElementById('data-value-section');
-            const channelConditionSection = document.getElementById('channel-condition-section');
-            const customConditionSection = document.getElementById('custom-condition-section');
-            const dataFieldInput = document.getElementById('data-field');
-            const dataOperatorSelect = document.getElementById('data-operator');
-            const dataValueInput = document.getElementById('data-value');
-            const channelValueSelect = document.getElementById('channel-value');
-            const customConditionTextarea = document.getElementById('custom-condition');
+            const pathConditionInput = document.getElementById('path-condition-input');
 
             // Inside: // #region --- STATE MANAGEMENT ---
             let editingConnectionIndex = null; // Add this line
@@ -1669,12 +1619,7 @@
                         icon: `<i class="fas fa-calendar-check text-purple-400 text-xl"></i>`,
                         category: 'ai',
                         properties: {
-                            userCalendar: {
-                                type: 'select',
-                                label: 'User Calendar',
-                                value: 'User1',
-                                options: ['User1', 'User2', 'User3', 'Shared Calendar']
-                            },
+                            calendarDate: { type: 'date', label: 'Calendar', value: '' },
                             setTimezone: { type: 'boolean', label: 'Set Timezone', value: false },
                             saveTimezone: { type: 'boolean', label: 'Save Contact Timezone', value: true },
                         }
@@ -1725,11 +1670,31 @@
                 facebook: { name: 'Facebook', color: '#1877F2', icon: 'fab fa-facebook' },
                 telegram: { name: 'Telegram', color: '#0088CC', icon: 'fab fa-telegram' },
                 email: { name: 'Email', color: '#EA4335', icon: 'fas fa-envelope' },
-                sms: { name: 'SMS', color: '#34B7F1', icon: 'fas fa-comment-alt' },
-                call: { name: 'Call', color: '#10B981', icon: 'fas fa-phone' }
+                sms: { name: 'SMS', color: '#34B7F1', icon: 'fas fa-comment-alt' }
             };
             // #endregion
+            function updateSVGCanvasSize() {
+                // Calculate the bounds of all nodes
+                const bounds = state.nodes.reduce((b, n) => ({
+                    minX: Math.min(b.minX, n.x),
+                    minY: Math.min(b.minY, n.y),
+                    maxX: Math.max(b.maxX, n.x + 280),
+                    maxY: Math.max(b.maxY, n.y + 280),
+                }), { minX: 0, minY: 0, maxX: 0, maxY: 0 });
 
+                // Add padding to bounds
+                const padding = 500;
+                const width = Math.max(window.innerWidth, bounds.maxX - bounds.minX + padding);
+                const height = Math.max(window.innerHeight, bounds.maxY - bounds.minY + padding);
+
+                // Update SVG dimensions
+                svgCanvas.setAttribute('width', width);
+                svgCanvas.setAttribute('height', height);
+
+                // Update node container position
+                nodeContainer.style.width = `${width}px`;
+                nodeContainer.style.height = `${height}px`;
+            }
             // #region --- HISTORY & PERSISTENCE ---
             function saveState(skipSave = false) {
                 history = history.slice(0, historyIndex + 1);
@@ -2065,7 +2030,7 @@
                     const midY = Math.pow(1 - t, 3) * p1.y + 3 * Math.pow(1 - t, 2) * t * p1.y + 3 * (1 - t) * t * t * p2.y + Math.pow(t, 3) * p2.y;
 
                     // Check if the connection has a condition to change the button's appearance
-                    const hasCondition = conn.condition && Object.keys(conn.condition).length > 0;
+                    const hasCondition = conn.condition && conn.condition.trim() !== '';
                     const conditionIcon = hasCondition ? 'fa-file-alt' : 'fa-code-branch';
                     const conditionClass = hasCondition ? 'has-condition' : '';
 
@@ -2180,6 +2145,16 @@
                         });
                     }
 
+                    // Initialize calendar picker for booking nodes
+                    // Initialize calendar picker for booking nodes
+                    const calendarPicker = el.querySelector('.calendar-picker');
+                    if (calendarPicker) {
+                        flatpickr(calendarPicker, {
+                            dateFormat: "Y-m-d",
+                            allowInput: true,
+                            theme: currentTheme // Use current theme
+                        });
+                    }
                     // Handle add tag button for edit_tags nodes
                     const addTagBtn = el.querySelector('.add-tag-btn');
                     if (addTagBtn) {
@@ -2395,59 +2370,10 @@
             function showPathConditionPopup(connIndex) {
                 editingConnectionIndex = connIndex;
                 const connection = state.connections[editingConnectionIndex];
-                
-                // Reset form
-                conditionTypeSelect.value = 'data';
-                dataFieldInput.value = '';
-                dataOperatorSelect.value = 'equals';
-                dataValueInput.value = '';
-                channelValueSelect.value = 'whatsapp';
-                customConditionTextarea.value = '';
-                
-                // Show/hide sections based on condition type
-                updateConditionSections();
-                
-                // Load existing condition if any
-                if (connection && connection.condition) {
-                    const condition = connection.condition;
-                    conditionTypeSelect.value = condition.type || 'data';
-                    
-                    if (condition.type === 'data') {
-                        dataFieldInput.value = condition.field || '';
-                        dataOperatorSelect.value = condition.operator || 'equals';
-                        dataValueInput.value = condition.value || '';
-                    } else if (condition.type === 'channel') {
-                        channelValueSelect.value = condition.channel || 'whatsapp';
-                    } else if (condition.type === 'custom') {
-                        customConditionTextarea.value = condition.expression || '';
-                    }
-                    
-                    updateConditionSections();
-                }
-                
-                pathConditionModal.style.display = 'flex';
-                dataFieldInput.focus();
-            }
-
-            function updateConditionSections() {
-                const conditionType = conditionTypeSelect.value;
-                
-                // Hide all sections first
-                dataConditionSection.classList.add('hidden');
-                dataOperatorSection.classList.add('hidden');
-                dataValueSection.classList.add('hidden');
-                channelConditionSection.classList.add('hidden');
-                customConditionSection.classList.add('hidden');
-                
-                // Show relevant sections based on condition type
-                if (conditionType === 'data') {
-                    dataConditionSection.classList.remove('hidden');
-                    dataOperatorSection.classList.remove('hidden');
-                    dataValueSection.classList.remove('hidden');
-                } else if (conditionType === 'channel') {
-                    channelConditionSection.classList.remove('hidden');
-                } else if (conditionType === 'custom') {
-                    customConditionSection.classList.remove('hidden');
+                if (connection) {
+                    pathConditionInput.value = connection.condition || '';
+                    pathConditionModal.style.display = 'flex';
+                    pathConditionInput.focus();
                 }
             }
 
@@ -2460,20 +2386,7 @@
                 if (editingConnectionIndex !== null) {
                     const connection = state.connections[editingConnectionIndex];
                     if (connection) {
-                        const conditionType = conditionTypeSelect.value;
-                        let condition = { type: conditionType };
-                        
-                        if (conditionType === 'data') {
-                            condition.field = dataFieldInput.value.trim();
-                            condition.operator = dataOperatorSelect.value;
-                            condition.value = dataValueInput.value.trim();
-                        } else if (conditionType === 'channel') {
-                            condition.channel = channelValueSelect.value;
-                        } else if (conditionType === 'custom') {
-                            condition.expression = customConditionTextarea.value.trim();
-                        }
-                        
-                        connection.condition = condition;
+                        connection.condition = pathConditionInput.value.trim();
                         saveState();
                         render(); // Re-render to update the button icon
                     }
@@ -2612,7 +2525,7 @@
                                     from: connectionStartNodeId,
                                     to: endNodeId,
                                     connector: connectionStartConnector,
-                                    condition: {} // Initialize with empty condition object
+                                    condition: '' // Initialize with an empty condition
                                 });
                                 saveState();
                             }
@@ -2931,9 +2844,6 @@
                         return;
                     }
                 });
-
-                // Add event listener for condition type change
-                conditionTypeSelect.addEventListener('change', updateConditionSections);
 
                 canvasContainer.addEventListener('mousedown', handleCanvasMouseDown);
                 window.addEventListener('mousemove', handleMouseMove);
