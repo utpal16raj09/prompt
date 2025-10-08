@@ -2565,7 +2565,9 @@
             }
 
             function handleCanvasMouseDown(e) {
-                if (e.target.closest('.node, .control-button, #minimap, .node-panel, .channel-bar')) return;
+                // Add '.connection-controls' to the list of things to ignore
+                if (e.target.closest('.node, .control-button, #minimap, .node-panel, .channel-bar, .connection-controls')) return;
+
                 hideContextMenu();
 
                 if (e.button === 0 && e.target.closest('.workflow-canvas')) {
@@ -2783,10 +2785,8 @@
                 setupChannelBar();
                 setupModal();
 
-                // Initialize theme
                 document.documentElement.setAttribute('data-theme', currentTheme);
 
-                // Set initial theme icon
                 const themeIcon = document.querySelector('#theme-toggle i');
                 if (currentTheme === 'dark') {
                     themeIcon.className = 'fas fa-moon';
@@ -2798,23 +2798,22 @@
 
                 // --- EVENT LISTENERS ---
 
-                // Theme toggle
                 document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
 
-                // New, efficient listener for connection controls (condition & delete buttons)
-                svgCanvas.addEventListener('click', e => {
+                // UPDATED: Use 'mousedown' for better response and stop propagation
+                svgCanvas.addEventListener('mousedown', e => {
                     const conditionButton = e.target.closest('.condition-btn');
                     const deleteButton = e.target.closest('.delete-btn');
 
-                    // Handle click on the 'Set Condition' button
                     if (conditionButton) {
+                        e.stopPropagation(); // Prevent canvas panning
                         const connIndex = parseInt(conditionButton.dataset.connIndex);
                         showPathConditionPopup(connIndex);
                         return;
                     }
 
-                    // Handle click on the 'Delete Connection' button
                     if (deleteButton) {
+                        e.stopPropagation(); // Prevent canvas panning
                         const connIndex = parseInt(deleteButton.dataset.connIndex);
                         if (!isNaN(connIndex) && state.connections[connIndex]) {
                             state.connections.splice(connIndex, 1);
@@ -2825,7 +2824,6 @@
                     }
                 });
 
-                // Main canvas and window listeners
                 canvasContainer.addEventListener('mousedown', handleCanvasMouseDown);
                 window.addEventListener('mousemove', handleMouseMove);
                 window.addEventListener('mouseup', handleMouseUp);
@@ -2835,7 +2833,6 @@
                     if (!e.target.closest('#context-menu')) hideContextMenu();
                 });
 
-                // Path condition modal listeners
                 saveConditionButton.addEventListener('click', savePathCondition);
                 cancelConditionButton.addEventListener('click', hidePathConditionPopup);
                 pathConditionModal.addEventListener('click', (e) => {
@@ -2844,7 +2841,6 @@
                     }
                 });
 
-                // Canvas zooming
                 canvasContainer.addEventListener('wheel', e => {
                     e.preventDefault();
                     const zoomFactor = 1.1;
@@ -2860,7 +2856,6 @@
                     renderConnections();
                 }, { passive: false });
 
-                // UI Buttons for undo, redo, zoom
                 undoButton.addEventListener('click', undo);
                 redoButton.addEventListener('click', redo);
                 zoomInButton.addEventListener('click', () => {
@@ -2874,7 +2869,6 @@
                     renderConnections();
                 });
 
-                // Initial load
                 loadState();
                 render();
             }
