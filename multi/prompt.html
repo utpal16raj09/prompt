@@ -1673,28 +1673,7 @@
                 sms: { name: 'SMS', color: '#34B7F1', icon: 'fas fa-comment-alt' }
             };
             // #endregion
-            function updateSVGCanvasSize() {
-                // Calculate the bounds of all nodes
-                const bounds = state.nodes.reduce((b, n) => ({
-                    minX: Math.min(b.minX, n.x),
-                    minY: Math.min(b.minY, n.y),
-                    maxX: Math.max(b.maxX, n.x + 280),
-                    maxY: Math.max(b.maxY, n.y + 280),
-                }), { minX: 0, minY: 0, maxX: 0, maxY: 0 });
 
-                // Add padding to bounds
-                const padding = 500;
-                const width = Math.max(window.innerWidth, bounds.maxX - bounds.minX + padding);
-                const height = Math.max(window.innerHeight, bounds.maxY - bounds.minY + padding);
-
-                // Update SVG dimensions
-                svgCanvas.setAttribute('width', width);
-                svgCanvas.setAttribute('height', height);
-
-                // Update node container position
-                nodeContainer.style.width = `${width}px`;
-                nodeContainer.style.height = `${height}px`;
-            }
             // #region --- HISTORY & PERSISTENCE ---
             function saveState(skipSave = false) {
                 history = history.slice(0, historyIndex + 1);
