@@ -144,21 +144,6 @@
             font-size: 13px;
         }
 
-        .connection-insert-handle {
-            fill: var(--border-color);
-            r: 0;
-            cursor: pointer;
-            transition: r 0.2s ease;
-        }
-
-        .connection-group:hover .connection-insert-handle {
-            r: 6;
-        }
-
-        .connection-insert-handle:hover {
-            fill: var(--brand-color);
-        }
-
         .tags-input-area {
             display: flex;
             flex-direction: column;
@@ -173,54 +158,60 @@
             font-size: 13px;
         }
 
-        /* Remove connection point styles */
-        .connection-point-circle {
-            display: none;
-        }
-
-        .connection-insert-handle {
-            display: none;
-        }
-
-        .connection-group:hover .connection-insert-handle {
-            display: none;
-        }
-
-        .connection-insert-handle:hover {
-            display: none;
-        }
-
-        /* Add edge point styles */
-        .edge-point {
-            fill: var(--brand-color);
-            r: 6;
-            cursor: pointer;
+        /* Add these new styles */
+        .connection-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
             opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+            pointer-events: none;
+            background-color: var(--node-bg);
+            padding: 4px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .connection-group:hover .connection-controls {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .connection-edge-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
             transition: all 0.2s ease;
         }
 
-        .connection-group:hover .edge-point {
-            opacity: 1;
-            r: 8;
+        .connection-edge-btn.condition-btn {
+            background-color: var(--blue-color);
         }
 
-        .edge-point:hover {
-            fill: var(--blue-color);
-            r: 10;
-            opacity: 1;
+        .connection-edge-btn.condition-btn:hover {
+            background-color: #60a5fa;
+            /* Lighter blue */
         }
 
-        .edge-point-label {
-            font-size: 10px;
-            fill: var(--text-color);
-            text-anchor: middle;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s ease;
+        .connection-edge-btn.delete-btn {
+            background-color: var(--red-color);
         }
 
-        .connection-group:hover .edge-point-label {
-            opacity: 1;
+        .connection-edge-btn.delete-btn:hover {
+            background-color: #f87171;
+            /* Lighter red */
+        }
+
+        /* Style for when a condition is set */
+        .connection-edge-btn.has-condition {
+            background-color: var(--brand-color);
+            box-shadow: 0 0 8px var(--brand-color-light);
         }
 
         /* Node category colors */
@@ -1250,6 +1241,23 @@
             </div>
         </div>
     </div>
+    <div id="path-condition-modal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-lg font-semibold mb-2">Set Path Condition</h3>
+            <p class="text-gray-400 mb-4">
+                Define the condition that must be met for the workflow to proceed down this path. Leave blank for an
+                unconditional path.
+            </p>
+            <textarea id="path-condition-input"
+                class="w-full h-24 p-2 rounded bg-[#2a2a2a] border border-gray-600 text-white focus:outline-none focus:border-purple-500"
+                placeholder="e.g., user.tag == 'premium'"></textarea>
+            <div class="modal-buttons">
+                <button id="cancel-condition" class="modal-button cancel">Cancel</button>
+                <button id="save-condition" class="modal-button"
+                    style="background-color: var(--brand-color);">Save</button>
+            </div>
+        </div>
+    </div>
 
     <div id="context-menu" class="hidden"></div>
     <div class="absolute bottom-4 left-4 flex space-x-2 z-10" style="margin-left: 320px;">
@@ -1393,6 +1401,14 @@
             const deleteModalBody = document.getElementById('delete-modal-body');
             const confirmDelete = document.getElementById('confirm-delete');
             const cancelDelete = document.getElementById('cancel-delete');
+            // Inside: // #region --- ELEMENT SELECTORS ---
+            const pathConditionModal = document.getElementById('path-condition-modal');
+            const saveConditionButton = document.getElementById('save-condition');
+            const cancelConditionButton = document.getElementById('cancel-condition');
+            const pathConditionInput = document.getElementById('path-condition-input');
+
+            // Inside: // #region --- STATE MANAGEMENT ---
+            let editingConnectionIndex = null; // Add this line
             // #endregion
 
             // #region --- STATE MANAGEMENT ---
@@ -1403,7 +1419,6 @@
             let clipboard = [];
             let activeChannel = 'all';
             let nodesToDelete = [];
-            let connectionStartFromLine = null;
 
             let connectionStartConnector = null;
 
@@ -1418,54 +1433,6 @@
             let contextMenuCoords = { x: 0, y: 0 };
             const GRID_SIZE = 20;
             let currentTheme = localStorage.getItem('theme') || 'dark';
-
-            // Path condition modal management
-            let currentConnectionIndex = null;
-
-            function showPathConditionModal(connIndex) {
-                currentConnectionIndex = connIndex;
-                const connection = state.connections[connIndex];
-
-                // Populate existing data if any
-                if (connection.condition) {
-                    document.getElementById('condition-name').value = connection.condition.name || '';
-                    document.getElementById('condition-type').value = connection.condition.type || 'equals';
-                    document.getElementById('condition-value').value = connection.condition.value || '';
-                    document.getElementById('condition-description').value = connection.condition.description || '';
-                } else {
-                    // Clear fields
-                    document.getElementById('condition-name').value = '';
-                    document.getElementById('condition-type').value = 'equals';
-                    document.getElementById('condition-value').value = '';
-                    document.getElementById('condition-description').value = '';
-                }
-
-                document.getElementById('path-condition-modal').style.display = 'flex';
-            }
-
-            function hidePathConditionModal() {
-                document.getElementById('path-condition-modal').style.display = 'none';
-                currentConnectionIndex = null;
-            }
-
-            function savePathCondition() {
-                if (currentConnectionIndex === null) return;
-
-                const condition = {
-                    name: document.getElementById('condition-name').value,
-                    type: document.getElementById('condition-type').value,
-                    value: document.getElementById('condition-value').value,
-                    description: document.getElementById('condition-description').value,
-                    timestamp: new Date().toISOString()
-                };
-
-                state.connections[currentConnectionIndex].condition = condition;
-                saveState();
-                hidePathConditionModal();
-
-                // Show success message
-                alert('Path condition saved successfully!');
-            }
             // Add this to your toggleTheme function
             // Add this to your toggleTheme function
             function toggleTheme() {
@@ -1545,53 +1512,7 @@
                             advancedSettings: { type: 'textarea', label: 'Advanced Settings', value: '' }
                         }
                     },
-                    {
-                        type: 'message',
-                        name: 'Message',
-                        icon: `<i class="fas fa-envelope text-blue-400 text-xl"></i>`,
-                        category: 'communication',
-                        properties: {
-                            mode: {
-                                type: 'select',
-                                label: 'Mode',
-                                value: 'prompt',
-                                options: ['prompt', 'static']
-                            },
-                            content: {
-                                type: 'textarea',
-                                label: 'Content',
-                                value: 'Hello! How can I help you?',
-                                allowVariables: true  // 👈 enables variable insertion
-                            },
-                            variables: {
-                                type: 'multi-select',
-                                label: 'Insert Variables',
-                                options: ['{{user_name}}', '{{date}}', '{{time}}', '{{email}}'],
-                                value: []
-                            }
-                        }
-                    },
-                    {
-                        type: 'call',
-                        name: 'Call',
-                        icon: `<i class="fas fa-phone text-blue-400 text-xl"></i>`,
-                        category: 'communication',
-                        properties: {
-                            duration: { type: 'text', label: 'Duration', value: '30 minutes' },
-                            description: { type: 'textarea', label: 'Description', value: 'Call settings' }
-                        }
-                    },
-                    {
-                        type: 'email',
-                        name: 'Email',
-                        icon: `<i class="fas fa-mail-bulk text-blue-400 text-xl"></i>`,
-                        category: 'communication',
-                        properties: {
-                            subject: { type: 'text', label: 'Subject', value: 'Important Update' },
-                            recipients: { type: 'text', label: 'Recipients', value: 'user@example.com' },
-                            body: { type: 'textarea', label: 'Body', value: 'Dear user,...' }
-                        }
-                    }
+
 
                 ],
                 control: [
@@ -2049,93 +1970,75 @@
                 const svgGroups = state.connections.map((conn, index) => {
                     const fromNode = state.nodes.find(n => n.id === conn.from);
                     const toNode = state.nodes.find(n => n.id === conn.to);
-
-                    // Skip if nodes not found
                     if (!fromNode || !toNode) return '';
 
                     const fromEl = document.getElementById(`node-${fromNode.id}`);
                     const toEl = document.getElementById(`node-${toNode.id}`);
-
-                    // Skip if DOM elements not found
                     if (!fromEl || !toEl) return '';
 
-                    // Use offsetWidth/offsetHeight instead of getBoundingClientRect() - they are not affected by zoom
                     const fromWidth = fromEl.offsetWidth;
                     const fromHeight = fromEl.offsetHeight;
                     const toWidth = toEl.offsetWidth;
                     const toHeight = toEl.offsetHeight;
 
-                    // Calculate connection points using fixed node dimensions
-                    const p1 = {
-                        x: fromNode.x + fromWidth,
-                        y: fromNode.y + fromHeight / 2
-                    };
-                    const p2 = {
-                        x: toNode.x,
-                        y: toNode.y + toHeight / 2
-                    };
-
-                    // Ensure we have valid points
-                    if (isNaN(p1.x) || isNaN(p1.y) || isNaN(p2.x) || isNaN(p2.y)) {
-                        return '';
-                    }
-
-                    const offset = Math.max(50, Math.abs(p2.x - p1.x) * 0.5);
-                    let d = '';
-
-                    // Handle branch connections
-                    if (conn.branchPoint) {
-                        // This is a branch connection - draw from branch point to target node
-                        const branchX = conn.branchPoint.x;
-                        const branchY = conn.branchPoint.y;
-                        const branchOffset = Math.max(50, Math.abs(p2.x - branchX) * 0.5);
-                        d = `M ${branchX} ${branchY} C ${branchX + branchOffset} ${branchY}, ${p2.x - branchOffset} ${p2.y}, ${p2.x} ${p2.y}`;
+                    // Determine start point (p1) based on the specific connector used
+                    let p1;
+                    if (conn.connector === 'yes') {
+                        // 'Yes' connector is on the bottom-left of the path_conditions node
+                        p1 = { x: fromNode.x + fromWidth * 0.25, y: fromNode.y + fromHeight };
+                    } else if (conn.connector === 'no') {
+                        // 'No' connector is on the bottom-right of the path_conditions node
+                        p1 = { x: fromNode.x + fromWidth * 0.75, y: fromNode.y + fromHeight };
                     } else {
-                        // Regular connection
-                        d = `M ${p1.x} ${p1.y} C ${p1.x + offset} ${p1.y}, ${p2.x - offset} ${p2.y}, ${p2.x} ${p2.y}`;
+                        // Default output connector is on the right side for all other nodes
+                        p1 = { x: fromNode.x + fromWidth, y: fromNode.y + fromHeight / 2 };
                     }
 
-                    // Calculate midpoint for edge point
-                    const midX = (p1.x + p2.x) / 2;
-                    const midY = (p1.y + p2.y) / 2;
+                    // The end point (p2) is always the middle of the left side of the target node
+                    const p2 = { x: toNode.x, y: toNode.y + toHeight / 2 };
+
+                    if (isNaN(p1.x) || isNaN(p1.y) || isNaN(p2.x) || isNaN(p2.y)) return '';
+
+                    // Calculate the Bezier curve for the line
+                    const offset = Math.max(50, Math.abs(p2.x - p1.x) * 0.5);
+                    const d = `M ${p1.x} ${p1.y} C ${p1.x + offset} ${p1.y}, ${p2.x - offset} ${p2.y}, ${p2.x} ${p2.y}`;
+
+                    // Calculate the midpoint (where t=0.5) of the curve to place the control box
+                    const t = 0.5;
+                    const midX = Math.pow(1 - t, 3) * p1.x + 3 * Math.pow(1 - t, 2) * t * (p1.x + offset) + 3 * (1 - t) * t * t * (p2.x - offset) + Math.pow(t, 3) * p2.x;
+                    const midY = Math.pow(1 - t, 3) * p1.y + 3 * Math.pow(1 - t, 2) * t * p1.y + 3 * (1 - t) * t * t * p2.y + Math.pow(t, 3) * p2.y;
+
+                    // Check if the connection has a condition to change the button's appearance
+                    const hasCondition = conn.condition && conn.condition.trim() !== '';
+                    const conditionIcon = hasCondition ? 'fa-file-alt' : 'fa-code-branch';
+                    const conditionClass = hasCondition ? 'has-condition' : '';
 
                     return `
-            <g class="connection-group">
+            <g class="connection-group" data-conn-index="${index}">
                 <path d="${d}" class="connection-line" />
                 <path d="${d}" class="connection-hitbox" />
-                
-                <!-- Edge Point -->
-                <circle cx="${midX}" cy="${midY}" r="6" class="edge-point" 
-                    data-conn-index="${index}" />
-                <text x="${midX}" y="${midY - 10}" class="edge-point-label">Edge</text>
-                
-                <foreignObject x="${midX - 12}" y="${midY - 12}" width="24" height="24">
-                    <button data-conn-index="${index}" class="connection-delete-button">&times;</button>
+                <foreignObject x="${midX - 40}" y="${midY - 18}" width="80" height="36">
+                    <div class="connection-controls">
+                        <button data-conn-index="${index}" class="connection-edge-btn condition-btn ${conditionClass}" title="Set Path Condition">
+                            <i class="fas ${conditionIcon}"></i>
+                        </button>
+                        <button data-conn-index="${index}" class="connection-edge-btn delete-btn" title="Delete Connection">
+                            &times;
+                        </button>
+                    </div>
                 </foreignObject>
             </g>
         `;
                 }).join('');
 
-                const tempLineHTML = tempLine ? tempLine.outerHTML : '';
-                // Clear the SVG canvas
                 svgCanvas.innerHTML = svgGroups;
 
-                // If there's a temporary line, add it to the SVG
+                // If a new line is actively being drawn, make sure it's visible
                 if (tempLine) {
                     svgCanvas.appendChild(tempLine);
                 }
-
-                // Add event listeners for edge points
-                document.querySelectorAll('.edge-point').forEach(circle => {
-                    circle.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const connIndex = parseInt(e.target.dataset.connIndex);
-                        if (!isNaN(connIndex) && state.connections[connIndex]) {
-                            showPathConditionModal(connIndex);
-                        }
-                    });
-                });
             }
+
             function renderMinimap() {
                 if (state.nodes.length === 0) {
                     minimapNodes.innerHTML = '';
@@ -2222,6 +2125,7 @@
                     }
 
                     // Initialize calendar picker for booking nodes
+                    // Initialize calendar picker for booking nodes
                     const calendarPicker = el.querySelector('.calendar-picker');
                     if (calendarPicker) {
                         flatpickr(calendarPicker, {
@@ -2230,7 +2134,6 @@
                             theme: currentTheme // Use current theme
                         });
                     }
-
                     // Handle add tag button for edit_tags nodes
                     const addTagBtn = el.querySelector('.add-tag-btn');
                     if (addTagBtn) {
@@ -2296,22 +2199,33 @@
                     }
                 });
 
-                // REMOVED: Connection points on edges event listeners
-                // The edge point event listeners are now added in the renderConnections function
-
-                // Add event listeners for connection delete buttons
-                document.querySelectorAll('.connection-delete-button').forEach(button => {
-                    button.addEventListener('click', (e) => {
+                // Add event listeners for connection points on edges
+                document.querySelectorAll('.connection-point-circle').forEach(circle => {
+                    circle.addEventListener('mousedown', (e) => {
                         e.stopPropagation();
+                        e.preventDefault();
+
                         const connIndex = parseInt(e.target.dataset.connIndex);
+                        const tValue = parseFloat(e.target.dataset.tValue);
+
                         if (!isNaN(connIndex) && state.connections[connIndex]) {
-                            state.connections.splice(connIndex, 1);
-                            saveState();
-                            render();
+                            // Start drawing a new connection from this edge point
+                            isDrawingConnection = true;
+                            connectionStartFromLine = {
+                                connIndex: connIndex,
+                                tValue: tValue
+                            };
+
+                            // Create temporary line
+                            tempLine = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                            tempLine.setAttribute('class', 'connection-line');
+                            tempLine.style.stroke = 'var(--brand-color)';
+                            svgCanvas.appendChild(tempLine);
                         }
                     });
                 });
             }
+
             function createConnector(nodeId, type) {
                 const c = document.createElement('div');
                 c.className = 'node-connector';
@@ -2431,6 +2345,34 @@
                 saveState();
                 render();
             }
+            // #region --- PATH CONDITION POPUP ---
+            function showPathConditionPopup(connIndex) {
+                editingConnectionIndex = connIndex;
+                const connection = state.connections[editingConnectionIndex];
+                if (connection) {
+                    pathConditionInput.value = connection.condition || '';
+                    pathConditionModal.style.display = 'flex';
+                    pathConditionInput.focus();
+                }
+            }
+
+            function hidePathConditionPopup() {
+                pathConditionModal.style.display = 'none';
+                editingConnectionIndex = null;
+            }
+
+            function savePathCondition() {
+                if (editingConnectionIndex !== null) {
+                    const connection = state.connections[editingConnectionIndex];
+                    if (connection) {
+                        connection.condition = pathConditionInput.value.trim();
+                        saveState();
+                        render(); // Re-render to update the button icon
+                    }
+                }
+                hidePathConditionPopup();
+            }
+            // #endregion
             // #endregion
 
             // #region --- EVENT HANDLERS ---
@@ -2493,78 +2435,38 @@
                 if (isDraggingNode) {
                     selectedNodeIds.forEach(id => {
                         const node = state.nodes.find(n => n.id === id);
-                        node.x = snapToGrid(node.dragStart.x + (mousePos.x - dragOffset.x - node.dragStart.x));
-                        node.y = snapToGrid(node.dragStart.y + (mousePos.y - dragOffset.y - node.dragStart.y));
+                        // Prevent dragging the start node
+                        if (node.type !== 'start') {
+                            node.x = snapToGrid(node.dragStart.x + (mousePos.x - dragOffset.x - node.dragStart.x));
+                            node.y = snapToGrid(node.dragStart.y + (mousePos.y - dragOffset.y - node.dragStart.y));
+                        }
                     });
                     render();
                 } else if (isDrawingConnection) {
-                    if (connectionStartFromLine) {
-                        // Drawing from connection point
-                        const conn = state.connections[connectionStartFromLine.connIndex];
-                        const fromNode = state.nodes.find(n => n.id === conn.from);
-                        const toNode = state.nodes.find(n => n.id === conn.to);
+                    // This block now only handles drawing from a node connector
+                    const startNode = state.nodes.find(n => n.id === connectionStartNodeId);
+                    if (startNode && tempLine) {
+                        const startEl = document.getElementById(`node-${startNode.id}`);
+                        if (startEl) {
+                            const startWidth = startEl.offsetWidth;
+                            const startHeight = startEl.offsetHeight;
 
-                        if (fromNode && toNode) {
-                            const fromEl = document.getElementById(`node-${fromNode.id}`);
-                            const toEl = document.getElementById(`node-${toNode.id}`);
-
-                            if (fromEl && toEl) {
-                                const fromWidth = fromEl.offsetWidth;
-                                const fromHeight = fromEl.offsetHeight;
-                                const toWidth = toEl.offsetWidth;
-                                const toHeight = toEl.offsetHeight;
-
-                                const p1 = {
-                                    x: fromNode.x + fromWidth,
-                                    y: fromNode.y + fromHeight / 2
-                                };
-                                const p2 = {
-                                    x: toNode.x,
-                                    y: toNode.y + toHeight / 2
-                                };
-                                const offset = Math.max(50, Math.abs(p2.x - p1.x) * 0.5);
-
-                                // Calculate start point on the curve
-                                const startX = (1 - connectionStartFromLine.tValue) ** 3 * p1.x +
-                                    3 * (1 - connectionStartFromLine.tValue) ** 2 * connectionStartFromLine.tValue * (p1.x + offset) +
-                                    3 * (1 - connectionStartFromLine.tValue) * connectionStartFromLine.tValue ** 2 * (p2.x - offset) +
-                                    connectionStartFromLine.tValue ** 3 * p2.x;
-                                const startY = (1 - connectionStartFromLine.tValue) ** 3 * p1.y +
-                                    3 * (1 - connectionStartFromLine.tValue) ** 2 * connectionStartFromLine.tValue * p1.y +
-                                    3 * (1 - connectionStartFromLine.tValue) * connectionStartFromLine.tValue ** 2 * p2.y +
-                                    connectionStartFromLine.tValue ** 3 * p2.y;
-
-                                // Store the branch position for later use
-                                connectionStartFromLine.branchX = startX;
-                                connectionStartFromLine.branchY = startY;
-
-                                const endX = mousePos.x;
-                                const endY = mousePos.y;
-                                const newOffset = Math.max(50, Math.abs(endX - startX) * 0.5);
-                                const d = `M ${startX} ${startY} C ${startX + newOffset} ${startY}, ${endX - newOffset} ${endY}, ${endX} ${endY}`;
-                                tempLine.setAttribute('d', d);
+                            // Determine start point based on the specific connector if available
+                            let p1;
+                            if (connectionStartConnector === 'yes') {
+                                p1 = { x: startNode.x + startWidth * 0.25, y: startNode.y + startHeight };
+                            } else if (connectionStartConnector === 'no') {
+                                p1 = { x: startNode.x + startWidth * 0.75, y: startNode.y + startHeight };
+                            } else {
+                                // Default output connector on the right side
+                                p1 = { x: startNode.x + startWidth, y: startNode.y + startHeight / 2 };
                             }
-                        }
-                    } else {
-                        // Drawing from node connector
-                        const startNode = state.nodes.find(n => n.id === connectionStartNodeId);
-                        if (startNode) {
-                            const startEl = document.getElementById(`node-${startNode.id}`);
-                            if (startEl) {
-                                const startWidth = startEl.offsetWidth;
-                                const startHeight = startEl.offsetHeight;
 
-                                const p1 = {
-                                    x: startNode.x + startWidth,
-                                    y: startNode.y + startHeight / 2
-                                };
-
-                                const endX = mousePos.x;
-                                const endY = mousePos.y;
-                                const offset = Math.max(50, Math.abs(endX - p1.x) * 0.5);
-                                const d = `M ${p1.x} ${p1.y} C ${p1.x + offset} ${p1.y}, ${endX - offset} ${endY}, ${endX} ${endY}`;
-                                tempLine.setAttribute('d', d);
-                            }
+                            const endX = mousePos.x;
+                            const endY = mousePos.y;
+                            const offset = Math.max(50, Math.abs(endX - p1.x) * 0.5);
+                            const d = `M ${p1.x} ${p1.y} C ${p1.x + offset} ${p1.y}, ${endX - offset} ${endY}, ${endX} ${endY}`;
+                            tempLine.setAttribute('d', d);
                         }
                     }
                 }
@@ -2581,32 +2483,42 @@
                     saveState();
                 }
                 if (isDrawingConnection) {
-                    const endConnector = e.target.closest('.node-connector');
+                    // Allow dropping the connection anywhere on a valid target node
+                    const endNodeEl = e.target.closest('.node');
 
-                    // REMOVED: Connection point branching logic
+                    if (endNodeEl) {
+                        const endNodeId = parseInt(endNodeEl.id.split('-')[1]);
+                        const endNode = state.nodes.find(n => n.id === endNodeId);
 
-                    if (endConnector) {
-                        // Original connection completion from node to node
-                        const endNodeId = parseInt(endConnector.parentElement.id.split('-')[1]);
-                        if (connectionStartNodeId !== endNodeId) {
-                            state.connections.push({
-                                from: connectionStartNodeId,
-                                to: endNodeId,
-                                connector: connectionStartConnector
-                            });
-                            saveState();
+                        // A connection is valid if it's not to the same node and the target is not the 'start' node
+                        if (endNode && connectionStartNodeId !== endNodeId && endNode.type !== 'start') {
+                            // Check for duplicate connections
+                            const alreadyExists = state.connections.some(c =>
+                                c.from === connectionStartNodeId &&
+                                c.to === endNodeId &&
+                                c.connector === connectionStartConnector
+                            );
+
+                            if (!alreadyExists) {
+                                state.connections.push({
+                                    from: connectionStartNodeId,
+                                    to: endNodeId,
+                                    connector: connectionStartConnector,
+                                    condition: '' // Initialize with an empty condition
+                                });
+                                saveState();
+                            }
                         }
                     }
 
+                    // Cleanup after drawing attempt (successful or not)
                     if (tempLine) tempLine.remove();
                     isDrawingConnection = false;
                     connectionStartNodeId = null;
                     connectionStartConnector = null;
-                    connectionStartFromLine = null;
                     tempLine = null;
-                    render();
+                    render(); // Re-render to show the new connection or remove the temp line
                 }
-
                 if (isSelecting) {
                     const rect = selectionBox.getBoundingClientRect();
                     const canvasRect = canvasContainer.getBoundingClientRect();
@@ -2639,7 +2551,6 @@
                     render();
                 }
             }
-
             function handleKeyDown(e) {
                 if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT') return;
 
@@ -2842,7 +2753,6 @@
             }
 
             function setupModal() {
-                // Existing delete modal code...
                 confirmDelete.addEventListener('click', () => {
                     if (nodesToDelete.length > 0) {
                         nodesToDelete.forEach(id => {
@@ -2864,15 +2774,6 @@
                         hideDeleteModal();
                     }
                 });
-
-                // Path condition modal setup
-                document.getElementById('save-path-condition').addEventListener('click', savePathCondition);
-                document.getElementById('cancel-path-condition').addEventListener('click', hidePathConditionModal);
-                document.getElementById('path-condition-modal').addEventListener('click', (e) => {
-                    if (e.target === document.getElementById('path-condition-modal')) {
-                        hidePathConditionModal();
-                    }
-                });
             }
             // #endregion
 
@@ -2881,6 +2782,7 @@
                 setupNodePanel();
                 setupChannelBar();
                 setupModal();
+
                 // Initialize theme
                 document.documentElement.setAttribute('data-theme', currentTheme);
 
@@ -2894,20 +2796,36 @@
                     themeIcon.title = 'Switch to Dark Mode';
                 }
 
-                // Add theme toggle event listener
+                // --- EVENT LISTENERS ---
+
+                // Theme toggle
                 document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
 
-                svgCanvas.addEventListener('mousedown', e => {
-                    if (e.target.classList.contains('connection-delete-button')) {
-                        e.stopPropagation();
-                        const connIndex = parseInt(e.target.dataset.connIndex);
+                // New, efficient listener for connection controls (condition & delete buttons)
+                svgCanvas.addEventListener('click', e => {
+                    const conditionButton = e.target.closest('.condition-btn');
+                    const deleteButton = e.target.closest('.delete-btn');
+
+                    // Handle click on the 'Set Condition' button
+                    if (conditionButton) {
+                        const connIndex = parseInt(conditionButton.dataset.connIndex);
+                        showPathConditionPopup(connIndex);
+                        return;
+                    }
+
+                    // Handle click on the 'Delete Connection' button
+                    if (deleteButton) {
+                        const connIndex = parseInt(deleteButton.dataset.connIndex);
                         if (!isNaN(connIndex) && state.connections[connIndex]) {
                             state.connections.splice(connIndex, 1);
                             saveState();
                             render();
                         }
+                        return;
                     }
                 });
+
+                // Main canvas and window listeners
                 canvasContainer.addEventListener('mousedown', handleCanvasMouseDown);
                 window.addEventListener('mousemove', handleMouseMove);
                 window.addEventListener('mouseup', handleMouseUp);
@@ -2916,40 +2834,50 @@
                 document.addEventListener('click', (e) => {
                     if (!e.target.closest('#context-menu')) hideContextMenu();
                 });
+
+                // Path condition modal listeners
+                saveConditionButton.addEventListener('click', savePathCondition);
+                cancelConditionButton.addEventListener('click', hidePathConditionPopup);
+                pathConditionModal.addEventListener('click', (e) => {
+                    if (e.target === pathConditionModal) {
+                        hidePathConditionPopup();
+                    }
+                });
+
+                // Canvas zooming
                 canvasContainer.addEventListener('wheel', e => {
                     e.preventDefault();
                     const zoomFactor = 1.1;
                     const oldScale = scale;
                     scale *= e.deltaY > 0 ? 1 / zoomFactor : zoomFactor;
                     scale = Math.max(0.1, Math.min(5, scale));
-                    const mouseX = e.clientX - canvasContainer.offsetLeft;
-                    const mouseY = e.clientY - canvasContainer.offsetTop;
+                    const rect = canvasContainer.getBoundingClientRect();
+                    const mouseX = e.clientX - rect.left;
+                    const mouseY = e.clientY - rect.top;
                     pan.x = mouseX - (mouseX - pan.x) * (scale / oldScale);
                     pan.y = mouseY - (mouseY - pan.y) * (scale / oldScale);
                     applyTransform();
-                    renderConnections(); // Add this line to re-render connections after zoom
+                    renderConnections();
                 }, { passive: false });
 
-
-                // UI Buttons
+                // UI Buttons for undo, redo, zoom
                 undoButton.addEventListener('click', undo);
                 redoButton.addEventListener('click', redo);
                 zoomInButton.addEventListener('click', () => {
                     scale = Math.min(5, scale * 1.2);
                     applyTransform();
-                    renderConnections(); // Add this line
+                    renderConnections();
                 });
-
                 zoomOutButton.addEventListener('click', () => {
                     scale = Math.max(0.1, scale / 1.2);
                     applyTransform();
-                    renderConnections(); // Add this line
+                    renderConnections();
                 });
+
                 // Initial load
                 loadState();
                 render();
             }
-
             init();
         });
     </script>
