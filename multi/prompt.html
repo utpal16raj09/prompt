@@ -173,24 +173,53 @@
             font-size: 13px;
         }
 
+        /* Remove connection point styles */
         .connection-point-circle {
-            fill: var(--brand-color);
-            r: 6;
-            cursor: crosshair;
-            transition: all 0.2s ease;
-            opacity: 0;
-            stroke: var(--node-bg);
-            stroke-width: 2;
+            display: none;
         }
 
-        .connection-group:hover .connection-point-circle {
+        .connection-insert-handle {
+            display: none;
+        }
+
+        .connection-group:hover .connection-insert-handle {
+            display: none;
+        }
+
+        .connection-insert-handle:hover {
+            display: none;
+        }
+
+        /* Add edge point styles */
+        .edge-point {
+            fill: var(--brand-color);
+            r: 6;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+
+        .connection-group:hover .edge-point {
             opacity: 1;
             r: 8;
         }
 
-        .connection-point-circle:hover {
+        .edge-point:hover {
             fill: var(--blue-color);
             r: 10;
+            opacity: 1;
+        }
+
+        .edge-point-label {
+            font-size: 10px;
+            fill: var(--text-color);
+            text-anchor: middle;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .connection-group:hover .edge-point-label {
             opacity: 1;
         }
 
@@ -1389,6 +1418,54 @@
             let contextMenuCoords = { x: 0, y: 0 };
             const GRID_SIZE = 20;
             let currentTheme = localStorage.getItem('theme') || 'dark';
+
+            // Path condition modal management
+            let currentConnectionIndex = null;
+
+            function showPathConditionModal(connIndex) {
+                currentConnectionIndex = connIndex;
+                const connection = state.connections[connIndex];
+
+                // Populate existing data if any
+                if (connection.condition) {
+                    document.getElementById('condition-name').value = connection.condition.name || '';
+                    document.getElementById('condition-type').value = connection.condition.type || 'equals';
+                    document.getElementById('condition-value').value = connection.condition.value || '';
+                    document.getElementById('condition-description').value = connection.condition.description || '';
+                } else {
+                    // Clear fields
+                    document.getElementById('condition-name').value = '';
+                    document.getElementById('condition-type').value = 'equals';
+                    document.getElementById('condition-value').value = '';
+                    document.getElementById('condition-description').value = '';
+                }
+
+                document.getElementById('path-condition-modal').style.display = 'flex';
+            }
+
+            function hidePathConditionModal() {
+                document.getElementById('path-condition-modal').style.display = 'none';
+                currentConnectionIndex = null;
+            }
+
+            function savePathCondition() {
+                if (currentConnectionIndex === null) return;
+
+                const condition = {
+                    name: document.getElementById('condition-name').value,
+                    type: document.getElementById('condition-type').value,
+                    value: document.getElementById('condition-value').value,
+                    description: document.getElementById('condition-description').value,
+                    timestamp: new Date().toISOString()
+                };
+
+                state.connections[currentConnectionIndex].condition = condition;
+                saveState();
+                hidePathConditionModal();
+
+                // Show success message
+                alert('Path condition saved successfully!');
+            }
             // Add this to your toggleTheme function
             // Add this to your toggleTheme function
             function toggleTheme() {
@@ -2018,49 +2095,21 @@
                         d = `M ${p1.x} ${p1.y} C ${p1.x + offset} ${p1.y}, ${p2.x - offset} ${p2.y}, ${p2.x} ${p2.y}`;
                     }
 
-                    // Calculate multiple points along the curve for connection points
-                    const points = [];
-                    for (let t = 0.25; t < 1; t += 0.25) {
-                        let x, y;
-
-                        if (conn.branchPoint) {
-                            // For branch connections, calculate points along the branch curve
-                            const branchOffset = Math.max(50, Math.abs(p2.x - conn.branchPoint.x) * 0.5);
-                            x = (1 - t) ** 3 * conn.branchPoint.x +
-                                3 * (1 - t) ** 2 * t * (conn.branchPoint.x + branchOffset) +
-                                3 * (1 - t) * t ** 2 * (p2.x - branchOffset) +
-                                t ** 3 * p2.x;
-                            y = (1 - t) ** 3 * conn.branchPoint.y +
-                                3 * (1 - t) ** 2 * t * conn.branchPoint.y +
-                                3 * (1 - t) * t ** 2 * p2.y +
-                                t ** 3 * p2.y;
-                        } else {
-                            // For regular connections
-                            x = (1 - t) ** 3 * p1.x +
-                                3 * (1 - t) ** 2 * t * (p1.x + offset) +
-                                3 * (1 - t) * t ** 2 * (p2.x - offset) +
-                                t ** 3 * p2.x;
-                            y = (1 - t) ** 3 * p1.y +
-                                3 * (1 - t) ** 2 * t * p1.y +
-                                3 * (1 - t) * t ** 2 * p2.y +
-                                t ** 3 * p2.y;
-                        }
-                        points.push({ x, y, t });
-                    }
-
-                    // Create connection points along the curve
-                    const connectionPoints = points.map((point, pointIndex) =>
-                        `<circle cx="${point.x}" cy="${point.y}" r="6" class="connection-point-circle" 
-        data-conn-index="${index}" data-point-index="${pointIndex}" 
-        data-t-value="${point.t}" />`
-                    ).join('');
+                    // Calculate midpoint for edge point
+                    const midX = (p1.x + p2.x) / 2;
+                    const midY = (p1.y + p2.y) / 2;
 
                     return `
             <g class="connection-group">
                 <path d="${d}" class="connection-line" />
                 <path d="${d}" class="connection-hitbox" />
-                ${connectionPoints}
-                <foreignObject x="${points[1].x - 12}" y="${points[1].y - 12}" width="24" height="24">
+                
+                <!-- Edge Point -->
+                <circle cx="${midX}" cy="${midY}" r="6" class="edge-point" 
+                    data-conn-index="${index}" />
+                <text x="${midX}" y="${midY - 10}" class="edge-point-label">Edge</text>
+                
+                <foreignObject x="${midX - 12}" y="${midY - 12}" width="24" height="24">
                     <button data-conn-index="${index}" class="connection-delete-button">&times;</button>
                 </foreignObject>
             </g>
@@ -2076,77 +2125,17 @@
                     svgCanvas.appendChild(tempLine);
                 }
 
-                // Re-attach event listeners for connection points
-                document.querySelectorAll('.connection-point-circle').forEach(circle => {
-                    circle.addEventListener('mousedown', (e) => {
+                // Add event listeners for edge points
+                document.querySelectorAll('.edge-point').forEach(circle => {
+                    circle.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        e.preventDefault();
-
                         const connIndex = parseInt(e.target.dataset.connIndex);
-                        const tValue = parseFloat(e.target.dataset.tValue);
-
                         if (!isNaN(connIndex) && state.connections[connIndex]) {
-                            isDrawingConnection = true;
-                            connectionStartFromLine = {
-                                connIndex: connIndex,
-                                tValue: tValue
-                            };
-
-                            // Calculate the branch point coordinates
-                            const conn = state.connections[connIndex];
-                            const fromNode = state.nodes.find(n => n.id === conn.from);
-                            const toNode = state.nodes.find(n => n.id === conn.to);
-
-                            if (fromNode && toNode) {
-                                const fromEl = document.getElementById(`node-${fromNode.id}`);
-                                const toEl = document.getElementById(`node-${toNode.id}`);
-
-                                if (fromEl && toEl) {
-                                    const fromWidth = fromEl.offsetWidth;
-                                    const fromHeight = fromEl.offsetHeight;
-                                    const toWidth = toEl.offsetWidth;
-                                    const toHeight = toEl.offsetHeight;
-
-                                    const p1 = {
-                                        x: fromNode.x + fromWidth,
-                                        y: fromNode.y + fromHeight / 2
-                                    };
-                                    const p2 = {
-                                        x: toNode.x,
-                                        y: toNode.y + toHeight / 2
-                                    };
-
-                                    const offset = Math.max(50, Math.abs(p2.x - p1.x) * 0.5);
-
-                                    // Calculate the exact branch point on the curve
-                                    const branchX = (1 - tValue) ** 3 * p1.x +
-                                        3 * (1 - tValue) ** 2 * tValue * (p1.x + offset) +
-                                        3 * (1 - tValue) * tValue ** 2 * (p2.x - offset) +
-                                        tValue ** 3 * p2.x;
-                                    const branchY = (1 - tValue) ** 3 * p1.y +
-                                        3 * (1 - tValue) ** 2 * tValue * p1.y +
-                                        3 * (1 - tValue) * tValue ** 2 * p2.y +
-                                        tValue ** 3 * p2.y;
-
-                                    // Store the branch coordinates
-                                    connectionStartFromLine.branchX = branchX;
-                                    connectionStartFromLine.branchY = branchY;
-                                }
-                            }
-
-                            // Create a properly styled temporary line
-                            tempLine = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                            tempLine.setAttribute('class', 'connection-line');
-                            tempLine.setAttribute('stroke', 'var(--brand-color)');
-                            tempLine.setAttribute('stroke-width', '3');
-                            tempLine.setAttribute('fill', 'none');
-                            tempLine.setAttribute('stroke-dasharray', '5,5'); // Make it dashed to distinguish from permanent lines
-                            svgCanvas.appendChild(tempLine);
+                            showPathConditionModal(connIndex);
                         }
                     });
                 });
             }
-
             function renderMinimap() {
                 if (state.nodes.length === 0) {
                     minimapNodes.innerHTML = '';
@@ -2233,7 +2222,6 @@
                     }
 
                     // Initialize calendar picker for booking nodes
-                    // Initialize calendar picker for booking nodes
                     const calendarPicker = el.querySelector('.calendar-picker');
                     if (calendarPicker) {
                         flatpickr(calendarPicker, {
@@ -2242,6 +2230,7 @@
                             theme: currentTheme // Use current theme
                         });
                     }
+
                     // Handle add tag button for edit_tags nodes
                     const addTagBtn = el.querySelector('.add-tag-btn');
                     if (addTagBtn) {
@@ -2307,33 +2296,22 @@
                     }
                 });
 
-                // Add event listeners for connection points on edges
-                document.querySelectorAll('.connection-point-circle').forEach(circle => {
-                    circle.addEventListener('mousedown', (e) => {
+                // REMOVED: Connection points on edges event listeners
+                // The edge point event listeners are now added in the renderConnections function
+
+                // Add event listeners for connection delete buttons
+                document.querySelectorAll('.connection-delete-button').forEach(button => {
+                    button.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        e.preventDefault();
-
                         const connIndex = parseInt(e.target.dataset.connIndex);
-                        const tValue = parseFloat(e.target.dataset.tValue);
-
                         if (!isNaN(connIndex) && state.connections[connIndex]) {
-                            // Start drawing a new connection from this edge point
-                            isDrawingConnection = true;
-                            connectionStartFromLine = {
-                                connIndex: connIndex,
-                                tValue: tValue
-                            };
-
-                            // Create temporary line
-                            tempLine = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                            tempLine.setAttribute('class', 'connection-line');
-                            tempLine.style.stroke = 'var(--brand-color)';
-                            svgCanvas.appendChild(tempLine);
+                            state.connections.splice(connIndex, 1);
+                            saveState();
+                            render();
                         }
                     });
                 });
             }
-
             function createConnector(nodeId, type) {
                 const c = document.createElement('div');
                 c.className = 'node-connector';
@@ -2605,28 +2583,9 @@
                 if (isDrawingConnection) {
                     const endConnector = e.target.closest('.node-connector');
 
-                    if (connectionStartFromLine && endConnector) {
-                        // Completing connection from edge point to a node
-                        const endNodeId = parseInt(endConnector.parentElement.id.split('-')[1]);
-                        const conn = state.connections[connectionStartFromLine.connIndex];
+                    // REMOVED: Connection point branching logic
 
-                        if (conn.from !== endNodeId && conn.to !== endNodeId) {
-                            // Create a new connection that branches from the existing connection
-                            // Store the branch point coordinates
-                            state.connections.push({
-                                from: conn.from,
-                                to: endNodeId,
-                                connector: conn.connector,
-                                branchPoint: {
-                                    x: connectionStartFromLine.branchX,
-                                    y: connectionStartFromLine.branchY,
-                                    tValue: connectionStartFromLine.tValue,
-                                    originalConnIndex: connectionStartFromLine.connIndex
-                                }
-                            });
-                            saveState();
-                        }
-                    } else if (endConnector) {
+                    if (endConnector) {
                         // Original connection completion from node to node
                         const endNodeId = parseInt(endConnector.parentElement.id.split('-')[1]);
                         if (connectionStartNodeId !== endNodeId) {
@@ -2647,6 +2606,7 @@
                     tempLine = null;
                     render();
                 }
+
                 if (isSelecting) {
                     const rect = selectionBox.getBoundingClientRect();
                     const canvasRect = canvasContainer.getBoundingClientRect();
@@ -2882,6 +2842,7 @@
             }
 
             function setupModal() {
+                // Existing delete modal code...
                 confirmDelete.addEventListener('click', () => {
                     if (nodesToDelete.length > 0) {
                         nodesToDelete.forEach(id => {
@@ -2901,6 +2862,15 @@
                 deleteModal.addEventListener('click', (e) => {
                     if (e.target === deleteModal) {
                         hideDeleteModal();
+                    }
+                });
+
+                // Path condition modal setup
+                document.getElementById('save-path-condition').addEventListener('click', savePathCondition);
+                document.getElementById('cancel-path-condition').addEventListener('click', hidePathConditionModal);
+                document.getElementById('path-condition-modal').addEventListener('click', (e) => {
+                    if (e.target === document.getElementById('path-condition-modal')) {
+                        hidePathConditionModal();
                     }
                 });
             }
