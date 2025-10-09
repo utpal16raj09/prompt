@@ -56,11 +56,12 @@
             background-color: var(--node-bg);
             border: 2px solid;
             border-radius: 12px;
-            width: 200px; /* Reduced from 280px */
-            min-height: 100px; /* Reduced from 280px */
+            width: 200px;
+            min-height: 100px;
             cursor: move;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
             transition: all 0.2s ease-in-out;
+            padding: 12px;
         }
 
         .node:hover {
@@ -158,7 +159,6 @@
             font-size: 13px;
         }
 
-        /* Add these new styles */
         .connection-controls {
             display: flex;
             align-items: center;
@@ -196,7 +196,6 @@
 
         .connection-edge-btn.condition-btn:hover {
             background-color: #60a5fa;
-            /* Lighter blue */
         }
 
         .connection-edge-btn.delete-btn {
@@ -205,10 +204,8 @@
 
         .connection-edge-btn.delete-btn:hover {
             background-color: #f87171;
-            /* Lighter red */
         }
 
-        /* Style for when a condition is set */
         .connection-edge-btn.has-condition {
             background-color: var(--brand-color);
             box-shadow: 0 0 8px var(--brand-color-light);
@@ -737,150 +734,94 @@
             margin: 6px 0;
         }
 
-        /* Conversation Node Layout */
-        .conversation-layout {
-            display: flex;
-            gap: 12px;
+        /* Settings Panel Styles */
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100%;
+            background: var(--node-bg);
+            border-left: 1px solid var(--border-color);
+            z-index: 30;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
         }
 
-        .conversation-vertical {
-            flex: 1;
+        .settings-panel.open {
+            right: 0;
+        }
+
+        .settings-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .settings-content {
+            padding: 16px;
+        }
+
+        /* Compact node styles */
+        .compact-node {
             display: flex;
             flex-direction: column;
             gap: 8px;
+            height: 100%;
         }
 
-        .conversation-horizontal {
-            flex: 1;
+        .compact-node-header {
             display: flex;
-            flex-direction: column;
+            align-items: center;
             gap: 8px;
         }
 
-        /* Flatpickr Dark Theme */
-        .flatpickr-calendar {
-            background: #000000 !important;
-            color: #ffffff !important;
-            border: 1px solid var(--border-color, #444);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+        .compact-node-title {
+            font-weight: 600;
+            font-size: 14px;
+            flex: 1;
         }
 
-        /* Days */
-        .flatpickr-day {
-            background: #000000;
-            color: #ffffff;
+        .compact-node-channel {
+            width: 100%;
         }
 
-        .flatpickr-day.selected {
-            background: var(--brand-color, #007bff);
-            color: #ffffff;
-            border-color: #ffffff;
-        }
-
-        .flatpickr-day.today {
-            border: 1px solid var(--brand-color, #007bff);
-        }
-
-        .flatpickr-day:hover {
-            background: var(--brand-color-light, #444);
-            color: #ffffff;
-        }
-
-        /* Month & Year */
-        .flatpickr-months .flatpickr-month {
-            color: #ffffff;
-        }
-
-        .flatpickr-current-month .flatpickr-monthDropdown-months,
-        .flatpickr-current-month input.cur-year {
-            background: #000000;
-            color: #ffffff;
-            border: none;
-        }
-
-        /* Weekdays */
-        .flatpickr-weekdays {
-            background: #808080;
-            color: #ffffff;
-        }
-
-        .flatpickr-weekday {
-            color: #ffffff;
-        }
-
-        .connection-point-container {
+        .compact-node-connectors {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-top: 12px;
+            pointer-events: none;
         }
 
-        .connection-point {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .connection-point-label {
-            font-size: 10px;
-            color: var(--text-muted);
-        }
-
-        .connection-point-dot {
-            width: 12px;
-            height: 12px;
+        .compact-node-connector {
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             background-color: var(--text-muted);
             cursor: pointer;
+            pointer-events: all;
             transition: all 0.2s;
+            border: 2px solid var(--node-bg);
         }
 
-        .connection-point-dot:hover {
+        .compact-node-connector:hover {
             background-color: var(--brand-color);
             transform: scale(1.2);
         }
 
-        /* Tags Section */
-        .tags-section {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid var(--border-color);
+        .compact-node-connector.in {
+            margin-left: -8px;
         }
 
-        .tag-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-
-        .tag-color {
-            width: 16px;
-            height: 16px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .tag-text {
-            flex: 1;
-            background: #2a2a2a;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 4px 8px;
-            font-size: 13px;
-            color: var(--text-color);
-        }
-
-        .add-tag-btn {
-            background: var(--brand-color);
-            border: none;
-            border-radius: 4px;
-            padding: 6px 12px;
-            color: white;
-            cursor: pointer;
-            font-size: 12px;
-            margin-top: 8px;
+        .compact-node-connector.out {
+            margin-right: -8px;
         }
 
         /* Light Theme Variables */
@@ -975,366 +916,15 @@
             transition: all 0.3s ease;
         }
 
-        /* Update category nodes in the left panel for light theme */
-        [data-theme="light"] .category-nodes {
-            background: transparent;
-        }
-
-        [data-theme="light"] .picker-node {
-            background-color: #f8fafc !important;
-            border: 1px solid #e2e8f0 !important;
-            color: #1e293b !important;
-        }
-
-        [data-theme="light"] .picker-node:hover {
-            background-color: #e2e8f0 !important;
-            border-color: #cbd5e1 !important;
-            color: #1e293b !important;
-        }
-
-        [data-theme="light"] .picker-node i {
-            color: #1e293b !important;
-        }
-
-        [data-theme="light"] .picker-node span {
-            color: #1e293b !important;
-        }
-
-        /* Update the entire node panel content area */
-        [data-theme="light"] .node-panel {
-            background: #f8fafc !important;
-            border: 1px solid #e2e8f0 !important;
-        }
-
-        [data-theme="light"] .node-panel-content {
-            background: #f8fafc !important;
-        }
-
-        [data-theme="light"] .category-section {
-            background: transparent !important;
-        }
-
-        [data-theme="light"] .category-header {
-            color: #1e293b !important;
-            border-bottom-color: #e2e8f0 !important;
-            background: transparent !important;
-        }
-
-        [data-theme="light"] .category-header:hover {
-            color: #8b5cf6 !important;
-            background: transparent !important;
-        }
-
-        [data-theme="light"] .category-header i {
-            color: #1e293b !important;
-        }
-
-        [data-theme="light"] .category-header:hover i {
-            color: #8b5cf6 !important;
-        }
-
-        /* More specific selectors for node panel items */
-        [data-theme="light"] #communication-nodes .picker-node,
-        [data-theme="light"] #control-nodes .picker-node,
-        [data-theme="light"] #ai-nodes .picker-node {
-            background-color: #f8fafc !important;
-            border: 1px solid #e2e8f0 !important;
-            color: #1e293b !important;
-        }
-
-        [data-theme="light"] #communication-nodes .picker-node:hover,
-        [data-theme="light"] #control-nodes .picker-node:hover,
-        [data-theme="light"] #ai-nodes .picker-node:hover {
-            background-color: #e2e8f0 !important;
-            border-color: #cbd5e1 !important;
-        }
-
-        /* Update node fields */
-        .node-field {
-            background: rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-        }
-
-        [data-theme="dark"] .node-field {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        /* Update select elements */
-        .channel-selector,
-        .field-value[type="select"] {
+        /* Update settings panel */
+        .settings-panel {
             background: var(--node-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
+            border-left: 1px solid var(--border-color);
             transition: all 0.3s ease;
-        }
-
-        /* Update toggle switch */
-        .toggle-switch .slider {
-            background-color: var(--border-color);
-            transition: all 0.3s ease;
-        }
-
-        /* Update calendar picker */
-        .calendar-picker {
-            color: var(--text-color);
-            background: var(--node-bg);
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-        }
-
-        /* Update channel bar for light theme */
-        [data-theme="light"] .channel-button {
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
-            color: #1e293b;
-        }
-
-        [data-theme="light"] .channel-button:hover {
-            background-color: #e2e8f0;
-        }
-
-        [data-theme="light"] .channel-button.active {
-            background-color: rgba(139, 92, 246, 0.1);
-            border-color: #8b5cf6;
-        }
-
-        [data-theme="light"] .toggle-channels {
-            background: #e2e8f0;
-            color: #1e293b;
-        }
-
-        [data-theme="light"] .toggle-channels:hover {
-            background: #cbd5e1;
-        }
-
-        /* Update minimap for light theme */
-        [data-theme="light"] #minimap {
-            background-color: rgba(248, 250, 252, 0.8);
-            border: 1px solid #e2e8f0;
-        }
-
-        [data-theme="light"] .minimap-node {
-            background-color: #64748b;
-        }
-
-        [data-theme="light"] .minimap-node.selected {
-            background-color: #8b5cf6;
-        }
-
-        [data-theme="light"] #minimap-viewport {
-            border: 1px solid #8b5cf6;
-            background-color: rgba(139, 92, 246, 0.1);
-        }
-
-        /* Update modal for light theme */
-        [data-theme="light"] .modal-button.cancel {
-            background: #e2e8f0;
-            color: #1e293b;
-            border: 1px solid #cbd5e1;
-        }
-
-        [data-theme="light"] .modal-button.cancel:hover {
-            background: #cbd5e1;
-        }
-
-        /* Update context menu for light theme */
-        [data-theme="light"] #context-menu {
-            background-color: #ffffff;
-            border: 1px solid #e2e8f0;
-            color: #1e293b;
-        }
-
-        [data-theme="light"] .context-menu-item:not(.disabled):hover {
-            background-color: #8b5cf6;
-            color: #ffffff;
-        }
-
-        [data-theme="light"] .context-menu-item.disabled {
-            color: #94a3b8;
-        }
-
-        [data-theme="light"] .context-menu-separator {
-            background-color: #e2e8f0;
-        }
-
-        /* Update toggle switch for light theme */
-        [data-theme="light"] .toggle-switch .slider {
-            background-color: #cbd5e1;
-        }
-
-        [data-theme="light"] .toggle-switch input:checked+.slider {
-            background-color: #8b5cf6;
-        }
-
-        /* Update hamburger menu and sidebar toggle for light theme */
-        [data-theme="light"] .toggle-panel {
-            background: #e2e8f0 !important;
-            color: #1e293b !important;
-            border: 1px solid #cbd5e1 !important;
-        }
-
-        [data-theme="light"] .toggle-panel:hover {
-            background: #cbd5e1 !important;
-            border-color: #94a3b8 !important;
-        }
-
-        [data-theme="light"] .panel-header {
-            background: #f8fafc !important;
-            border-bottom: 1px solid #e2e8f0 !important;
-        }
-
-        [data-theme="light"] .panel-header h3 {
-            color: #1e293b !important;
-        }
-
-        /* Update the collapsed sidebar state */
-        [data-theme="light"] .node-panel.collapsed {
-            background: #f8fafc !important;
-            border: 1px solid #e2e8f0 !important;
-        }
-
-        [data-theme="light"] .node-panel.collapsed .toggle-panel {
-            background: #e2e8f0 !important;
-            color: #1e293b !important;
-            border: 1px solid #cbd5e1 !important;
-        }
-
-        [data-theme="light"] .node-panel.collapsed .toggle-panel:hover {
-            background: #cbd5e1 !important;
-            border-color: #94a3b8 !important;
-        }
-
-        /* Update hamburger icon color */
-        [data-theme="light"] .toggle-panel i {
-            color: #1e293b !important;
-        }
-
-        [data-theme="light"] .toggle-panel:hover i {
-            color: #1e293b !important;
-        }
-
-        /* Override any specific icon colors */
-        [data-theme="light"] .fa-bars {
-            color: #1e293b !important;
-        }
-
-        [data-theme="light"] .fa-chevron-right {
-            color: #1e293b !important;
         }
 
         .add-tag-btn:hover {
             background: #9333ea;
-        }
-
-        /* Settings Panel Styles */
-        .settings-panel {
-            position: fixed;
-            top: 0;
-            right: -400px;
-            width: 400px;
-            height: 100%;
-            background: var(--node-bg);
-            border-left: 1px solid var(--border-color);
-            z-index: 30;
-            transition: right 0.3s ease;
-            overflow-y: auto;
-            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .settings-panel.open {
-            right: 0;
-        }
-
-        .settings-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .settings-content {
-            padding: 16px;
-        }
-
-        .settings-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background-color: var(--brand-color);
-            color: white;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-            z-index: 25;
-        }
-
-        .settings-button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-        }
-
-        .settings-button.active {
-            background-color: var(--blue-color);
-        }
-
-        /* Compact node styles */
-        .compact-node {
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .compact-node-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .compact-node-title {
-            font-weight: 600;
-            font-size: 14px;
-            flex: 1;
-        }
-
-        .compact-node-channel {
-            width: 100%;
-        }
-
-        .compact-node-connectors {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-        }
-
-        .compact-node-connector {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background-color: var(--text-muted);
-            cursor: pointer;
-        }
-
-        .compact-node-connector:hover {
-            background-color: var(--brand-color);
-            transform: scale(1.2);
-        }
-
-        .compact-node-connector.in {
-            margin-left: -6px;
-        }
-
-        .compact-node-connector.out {
-            margin-right: -6px;
         }
     </style>
 </head>
@@ -1509,10 +1099,6 @@
         <div id="selection-box" class="hidden"></div>
     </main>
 
-    <button id="settings-button" class="settings-button">
-        <i class="fas fa-cog"></i>
-    </button>
-
     <div id="settings-panel" class="settings-panel">
         <div class="settings-header">
             <h3 class="text-lg font-semibold">Node Settings</h3>
@@ -1523,7 +1109,7 @@
         <div id="settings-content" class="settings-content">
             <div id="no-node-selected" class="text-center py-8">
                 <i class="fas fa-mouse-pointer text-4xl mb-4 text-gray-500"></i>
-                <p class="text-gray-400">Select a node to edit its properties</p>
+                <p class="text-gray-400">Double-click a node to edit its properties</p>
             </div>
             <div id="node-settings" class="hidden">
                 <!-- Node settings will be populated here -->
@@ -1562,7 +1148,6 @@
             const confirmDelete = document.getElementById('confirm-delete');
             const cancelDelete = document.getElementById('cancel-delete');
             // Settings panel elements
-            const settingsButton = document.getElementById('settings-button');
             const settingsPanel = document.getElementById('settings-panel');
             const closeSettings = document.getElementById('close-settings');
             const settingsContent = document.getElementById('settings-content');
@@ -1610,8 +1195,7 @@
             let contextMenuCoords = { x: 0, y: 0 };
             const GRID_SIZE = 20;
             let currentTheme = localStorage.getItem('theme') || 'dark';
-            // Add this to your toggleTheme function
-            // Add this to your toggleTheme function
+
             function toggleTheme() {
                 currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
                 document.documentElement.setAttribute('data-theme', currentTheme);
@@ -1625,20 +1209,6 @@
                 } else {
                     themeIcon.className = 'fas fa-sun';
                     themeIcon.title = 'Switch to Dark Mode';
-                }
-
-                // Force update sidebar toggle button
-                const togglePanel = document.querySelector('#toggle-panel');
-                if (togglePanel) {
-                    if (currentTheme === 'light') {
-                        togglePanel.style.backgroundColor = '#e2e8f0';
-                        togglePanel.style.color = '#1e293b';
-                        togglePanel.style.borderColor = '#cbd5e1';
-                    } else {
-                        togglePanel.style.backgroundColor = '#2a2a2a';
-                        togglePanel.style.color = '#ffffff';
-                        togglePanel.style.borderColor = '#444';
-                    }
                 }
 
                 // Re-render to update connections and nodes
@@ -1689,8 +1259,6 @@
                             advancedSettings: { type: 'textarea', label: 'Advanced Settings', value: '' }
                         }
                     },
-
-
                 ],
                 control: [
                     {
@@ -1902,7 +1470,6 @@
             const screenToCanvasCoords = (x, y) => ({ x: (x - pan.x) / scale, y: (y - pan.y) / scale });
             function applyTransform() {
                 transformContainer.style.transform = `translate(${pan.x}px, ${pan.y}px) scale(${scale})`;
-                // Don't re-render connections here as it causes flickering
                 renderMinimap();
             }
             const snapToGrid = val => Math.round(val / GRID_SIZE) * GRID_SIZE;
@@ -1974,17 +1541,6 @@
                 attachListeners();
                 updateUndoRedoButtons();
                 renderMinimap();
-                
-                // Update settings panel if a node is selected
-                if (selectedNodeIds.size === 1) {
-                    const nodeId = Array.from(selectedNodeIds)[0];
-                    const node = state.nodes.find(n => n.id === nodeId);
-                    if (node) {
-                        updateSettingsPanel(node);
-                    }
-                } else {
-                    hideNodeSettings();
-                }
             }
 
             function getNodeContent(node) {
@@ -2049,18 +1605,8 @@
                     const toWidth = toEl.offsetWidth;
                     const toHeight = toEl.offsetHeight;
 
-                    // Determine start point (p1) based on the specific connector used
-                    let p1;
-                    if (conn.connector === 'yes') {
-                        // 'Yes' connector is on the bottom-left of the path_conditions node
-                        p1 = { x: fromNode.x + fromWidth * 0.25, y: fromNode.y + fromHeight };
-                    } else if (conn.connector === 'no') {
-                        // 'No' connector is on the bottom-right of the path_conditions node
-                        p1 = { x: fromNode.x + fromWidth * 0.75, y: fromNode.y + fromHeight };
-                    } else {
-                        // Default output connector is on the right side for all other nodes
-                        p1 = { x: fromNode.x + fromWidth, y: fromNode.y + fromHeight / 2 };
-                    }
+                    // Determine start point (p1) - always from the right side for output connector
+                    const p1 = { x: fromNode.x + fromWidth, y: fromNode.y + fromHeight / 2 };
 
                     // The end point (p2) is always the middle of the left side of the target node
                     const p2 = { x: toNode.x, y: toNode.y + toHeight / 2 };
@@ -2118,8 +1664,8 @@
                 const bounds = state.nodes.reduce((b, n) => ({
                     minX: Math.min(b.minX, n.x),
                     minY: Math.min(b.minY, n.y),
-                    maxX: Math.max(b.maxX, n.x + 200), // Updated to match new node width
-                    maxY: Math.max(b.maxY, n.y + 100), // Updated to match new node height
+                    maxX: Math.max(b.maxX, n.x + 200),
+                    maxY: Math.max(b.maxY, n.y + 100),
                 }), { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity });
 
                 const contentWidth = bounds.maxX - bounds.minX;
@@ -2252,19 +1798,13 @@
                 }
             }
             
-            function toggleSettingsPanel() {
-                if (selectedNodeIds.size === 1) {
-                    settingsPanel.classList.toggle('open');
-                    settingsButton.classList.toggle('active');
-                } else {
-                    settingsPanel.classList.remove('open');
-                    settingsButton.classList.remove('active');
-                }
+            function openSettingsPanel(node) {
+                updateSettingsPanel(node);
+                settingsPanel.classList.add('open');
             }
             
             function closeSettingsPanel() {
                 settingsPanel.classList.remove('open');
-                settingsButton.classList.remove('active');
             }
             // #endregion
 
@@ -2274,6 +1814,15 @@
                     const node = state.nodes.find(n => n.id === nodeId);
 
                     el.addEventListener('mousedown', e => onNodeMouseDown(e, nodeId));
+                    
+                    // Add double-click listener for opening settings
+                    el.addEventListener('dblclick', (e) => {
+                        e.stopPropagation();
+                        selectedNodeIds.clear();
+                        selectedNodeIds.add(nodeId);
+                        render();
+                        openSettingsPanel(node);
+                    });
 
                     // Handle title editing
                     const titleEl = el.querySelector('.compact-node-title');
@@ -2309,32 +1858,6 @@
                                 onConnectorMouseDown(e, nodeId);
                             }
                         });
-                    });
-                });
-
-                // Add event listeners for connection points on edges
-                document.querySelectorAll('.connection-point-circle').forEach(circle => {
-                    circle.addEventListener('mousedown', (e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-
-                        const connIndex = parseInt(e.target.dataset.connIndex);
-                        const tValue = parseFloat(e.target.dataset.tValue);
-
-                        if (!isNaN(connIndex) && state.connections[connIndex]) {
-                            // Start drawing a new connection from this edge point
-                            isDrawingConnection = true;
-                            connectionStartFromLine = {
-                                connIndex: connIndex,
-                                tValue: tValue
-                            };
-
-                            // Create temporary line
-                            tempLine = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                            tempLine.setAttribute('class', 'connection-line');
-                            tempLine.style.stroke = 'var(--brand-color)';
-                            svgCanvas.appendChild(tempLine);
-                        }
                     });
                 });
             }
@@ -2613,16 +2136,8 @@
                             const startWidth = startEl.offsetWidth;
                             const startHeight = startEl.offsetHeight;
 
-                            // Determine start point based on the specific connector if available
-                            let p1;
-                            if (connectionStartConnector === 'yes') {
-                                p1 = { x: startNode.x + startWidth * 0.25, y: startNode.y + startHeight };
-                            } else if (connectionStartConnector === 'no') {
-                                p1 = { x: startNode.x + startWidth * 0.75, y: startNode.y + startHeight };
-                            } else {
-                                // Default output connector on the right side
-                                p1 = { x: startNode.x + startWidth, y: startNode.y + startHeight / 2 };
-                            }
+                            // Determine start point - always from the right side for output connector
+                            const p1 = { x: startNode.x + startWidth, y: startNode.y + startHeight / 2 };
 
                             const endX = mousePos.x;
                             const endY = mousePos.y;
@@ -2657,15 +2172,13 @@
                             // Check for duplicate connections
                             const alreadyExists = state.connections.some(c =>
                                 c.from === connectionStartNodeId &&
-                                c.to === endNodeId &&
-                                c.connector === connectionStartConnector
+                                c.to === endNodeId
                             );
 
                             if (!alreadyExists) {
                                 state.connections.push({
                                     from: connectionStartNodeId,
                                     to: endNodeId,
-                                    connector: connectionStartConnector,
                                     condition: {} // Initialize with empty condition object
                                 });
                                 saveState();
@@ -2728,7 +2241,7 @@
 
             function handleCanvasMouseDown(e) {
                 // Add '.connection-controls' to the list of things to ignore
-                if (e.target.closest('.node, .control-button, #minimap, .node-panel, .channel-bar, .connection-controls, .settings-button, .settings-panel')) return;
+                if (e.target.closest('.node, .control-button, #minimap, .node-panel, .channel-bar, .connection-controls, .settings-panel')) return;
 
                 hideContextMenu();
 
@@ -2941,13 +2454,11 @@
             }
 
             function setupSettingsPanel() {
-                settingsButton.addEventListener('click', toggleSettingsPanel);
                 closeSettings.addEventListener('click', closeSettingsPanel);
                 
                 // Close settings panel when clicking outside
                 document.addEventListener('click', (e) => {
                     if (!e.target.closest('#settings-panel') && 
-                        !e.target.closest('#settings-button') && 
                         settingsPanel.classList.contains('open')) {
                         closeSettingsPanel();
                     }
