@@ -55,12 +55,13 @@
             position: absolute;
             background-color: var(--node-bg);
             border: 2px solid;
-            border-radius: 12px;
-            width: 280px;
-            min-height: 280px;
+            border-radius: 8px;
+            width: 180px;
+            min-height: 80px;
             cursor: move;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
             transition: all 0.2s ease-in-out;
+            padding: 12px;
         }
 
         .node:hover {
@@ -73,7 +74,6 @@
         }
 
         .node-body {
-            padding: 0 12px 12px;
             display: flex;
             flex-direction: column;
             gap: 8px;
@@ -144,6 +144,21 @@
             font-size: 13px;
         }
 
+        .connection-insert-handle {
+            fill: var(--border-color);
+            r: 0;
+            cursor: pointer;
+            transition: r 0.2s ease;
+        }
+
+        .connection-group:hover .connection-insert-handle {
+            r: 6;
+        }
+
+        .connection-insert-handle:hover {
+            fill: var(--brand-color);
+        }
+
         .tags-input-area {
             display: flex;
             flex-direction: column;
@@ -158,60 +173,25 @@
             font-size: 13px;
         }
 
-        /* Add these new styles */
-        .connection-controls {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            opacity: 0;
-            transition: opacity 0.2s ease-in-out;
-            pointer-events: none;
-            background-color: var(--node-bg);
-            padding: 4px;
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-        }
-
-        .connection-group:hover .connection-controls {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .connection-edge-btn {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
+        .connection-point-circle {
+            fill: var(--brand-color);
+            r: 6;
+            cursor: crosshair;
             transition: all 0.2s ease;
+            opacity: 0;
+            stroke: var(--node-bg);
+            stroke-width: 2;
         }
 
-        .connection-edge-btn.condition-btn {
-            background-color: var(--blue-color);
+        .connection-group:hover .connection-point-circle {
+            opacity: 1;
+            r: 8;
         }
 
-        .connection-edge-btn.condition-btn:hover {
-            background-color: #60a5fa;
-            /* Lighter blue */
-        }
-
-        .connection-edge-btn.delete-btn {
-            background-color: var(--red-color);
-        }
-
-        .connection-edge-btn.delete-btn:hover {
-            background-color: #f87171;
-            /* Lighter red */
-        }
-
-        /* Style for when a condition is set */
-        .connection-edge-btn.has-condition {
-            background-color: var(--brand-color);
-            box-shadow: 0 0 8px var(--brand-color-light);
+        .connection-point-circle:hover {
+            fill: var(--blue-color);
+            r: 10;
+            opacity: 1;
         }
 
         /* Node category colors */
@@ -229,8 +209,8 @@
 
         /* Compact start node */
         .node-start {
-            width: 160px !important;
-            min-height: 100px !important;
+            width: 120px !important;
+            min-height: 60px !important;
             text-align: center;
         }
 
@@ -431,100 +411,67 @@
             max-height: 500px;
         }
 
-        /* Channel Bar - Right Side */
-        .channel-bar {
+        /* Settings Panel - Right Side */
+        .settings-panel {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 320px;
             background: #1a1a1a;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 12px;
-            z-index: 20;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-        }
-
-        .channel-bar.collapsed {
-            width: 60px;
-            padding: 8px;
-        }
-
-        .channel-bar.collapsed .channel-buttons {
-            display: none;
-        }
-
-        .toggle-channels {
-            background: #2a2a2a;
-            border: none;
-            border-radius: 6px;
-            width: 44px;
-            height: 44px;
-            color: var(--text-color);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-
-        .toggle-channels:hover {
-            background: #3a3a3a;
-            transform: scale(1.05);
-        }
-
-        .channel-buttons {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .channel-button {
+            border-left: 1px solid var(--border-color);
+            z-index: 30;
             display: flex;
             flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .settings-panel.open {
+            transform: translateX(0);
+        }
+
+        .settings-panel-header {
+            display: flex;
             align-items: center;
-            padding: 8px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            min-width: 60px;
-            border: 1px solid transparent;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .channel-button:hover {
-            background-color: #3a3a3a;
-            transform: translateY(-2px);
+        .settings-panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
         }
 
-        .channel-button.active {
-            background-color: var(--brand-color-light);
-            border-color: var(--brand-color);
+        .settings-panel h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
         }
 
-        /* Node Field Styling */
-        .node-field {
-            margin: 8px 0;
-            padding: 8px;
+        .settings-panel .node-field {
+            margin: 12px 0;
+            padding: 12px;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 6px;
             border-left: 3px solid var(--brand-color);
         }
 
-        .node-field label {
+        .settings-panel .node-field label {
             display: block;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--text-muted);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        .node-field .field-value {
-            font-size: 13px;
+        .settings-panel .node-field .field-value {
+            font-size: 14px;
             color: var(--text-color);
             word-break: break-word;
             background: transparent;
@@ -535,15 +482,15 @@
             font-family: inherit;
         }
 
-        .node-field textarea.field-value {
-            min-height: 40px;
+        .settings-panel .node-field textarea.field-value {
+            min-height: 80px;
         }
 
-        .node-field select.field-value {
+        .settings-panel .node-field select.field-value {
             background: #2a2a2a;
             border: 1px solid var(--border-color);
             border-radius: 4px;
-            padding: 4px 8px;
+            padding: 8px 10px;
         }
 
         .channel-selector {
@@ -737,77 +684,7 @@
             margin: 6px 0;
         }
 
-        /* Conversation Node Layout */
-        .conversation-layout {
-            display: flex;
-            gap: 12px;
-        }
-
-        .conversation-vertical {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .conversation-horizontal {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        /* Flatpickr Dark Theme */
-        .flatpickr-calendar {
-            background: #000000 !important;
-            color: #ffffff !important;
-            border: 1px solid var(--border-color, #444);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
-        }
-
-        /* Days */
-        .flatpickr-day {
-            background: #000000;
-            color: #ffffff;
-        }
-
-        .flatpickr-day.selected {
-            background: var(--brand-color, #007bff);
-            color: #ffffff;
-            border-color: #ffffff;
-        }
-
-        .flatpickr-day.today {
-            border: 1px solid var(--brand-color, #007bff);
-        }
-
-        .flatpickr-day:hover {
-            background: var(--brand-color-light, #444);
-            color: #ffffff;
-        }
-
-        /* Month & Year */
-        .flatpickr-months .flatpickr-month {
-            color: #ffffff;
-        }
-
-        .flatpickr-current-month .flatpickr-monthDropdown-months,
-        .flatpickr-current-month input.cur-year {
-            background: #000000;
-            color: #ffffff;
-            border: none;
-        }
-
-        /* Weekdays */
-        .flatpickr-weekdays {
-            background: #808080;
-            color: #ffffff;
-        }
-
-        .flatpickr-weekday {
-            color: #ffffff;
-        }
-
+        /* Connection Point Container */
         .connection-point-container {
             display: flex;
             justify-content: space-between;
@@ -883,6 +760,143 @@
             margin-top: 8px;
         }
 
+        .add-tag-btn:hover {
+            background: #9333ea;
+        }
+
+        /* Compact node styling */
+        .compact-node-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .compact-node-title {
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100px;
+        }
+
+        .compact-node-icon {
+            font-size: 16px;
+        }
+
+        .compact-node-channel {
+            width: 100%;
+            font-size: 11px;
+            padding: 4px 6px;
+        }
+
+        /* Settings button at bottom */
+        #settings-button {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--brand-color);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s;
+            z-index: 25;
+        }
+
+        #settings-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        #settings-button:disabled {
+            background-color: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Channel Bar - Right Side */
+        .channel-bar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #1a1a1a;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .channel-bar.collapsed {
+            width: 60px;
+            padding: 8px;
+        }
+
+        .channel-bar.collapsed .channel-buttons {
+            display: none;
+        }
+
+        .toggle-channels {
+            background: #2a2a2a;
+            border: none;
+            border-radius: 6px;
+            width: 44px;
+            height: 44px;
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .toggle-channels:hover {
+            background: #3a3a3a;
+            transform: scale(1.05);
+        }
+
+        .channel-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .channel-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 60px;
+            border: 1px solid transparent;
+        }
+
+        .channel-button:hover {
+            background-color: #3a3a3a;
+            transform: translateY(-2px);
+        }
+
+        .channel-button.active {
+            background-color: var(--brand-color-light);
+            border-color: var(--brand-color);
+        }
+
         /* Light Theme Variables */
         [data-theme="light"] {
             --bg-color: #f8fafc;
@@ -945,9 +959,9 @@
             transition: all 0.3s ease;
         }
 
-        /* Update node panel and channel bar */
+        /* Update node panel and settings panel */
         .node-panel,
-        .channel-bar {
+        .settings-panel {
             background: var(--node-bg);
             border: 1px solid var(--border-color);
             transition: all 0.3s ease;
@@ -1082,148 +1096,23 @@
             transition: all 0.3s ease;
         }
 
-        /* Update channel bar for light theme */
-        [data-theme="light"] .channel-button {
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
-            color: #1e293b;
+        /* Update settings panel for light theme */
+        [data-theme="light"] .settings-panel {
+            background: #f8fafc !important;
+            border-left: 1px solid #e2e8f0 !important;
         }
 
-        [data-theme="light"] .channel-button:hover {
-            background-color: #e2e8f0;
+        [data-theme="light"] .settings-panel .node-field {
+            background: rgba(0, 0, 0, 0.05) !important;
         }
 
-        [data-theme="light"] .channel-button.active {
-            background-color: rgba(139, 92, 246, 0.1);
-            border-color: #8b5cf6;
-        }
-
-        [data-theme="light"] .toggle-channels {
-            background: #e2e8f0;
-            color: #1e293b;
-        }
-
-        [data-theme="light"] .toggle-channels:hover {
-            background: #cbd5e1;
-        }
-
-        /* Update minimap for light theme */
-        [data-theme="light"] #minimap {
-            background-color: rgba(248, 250, 252, 0.8);
-            border: 1px solid #e2e8f0;
-        }
-
-        [data-theme="light"] .minimap-node {
-            background-color: #64748b;
-        }
-
-        [data-theme="light"] .minimap-node.selected {
+        /* Update settings button for light theme */
+        [data-theme="light"] #settings-button {
             background-color: #8b5cf6;
         }
 
-        [data-theme="light"] #minimap-viewport {
-            border: 1px solid #8b5cf6;
-            background-color: rgba(139, 92, 246, 0.1);
-        }
-
-        /* Update modal for light theme */
-        [data-theme="light"] .modal-button.cancel {
-            background: #e2e8f0;
-            color: #1e293b;
-            border: 1px solid #cbd5e1;
-        }
-
-        [data-theme="light"] .modal-button.cancel:hover {
-            background: #cbd5e1;
-        }
-
-        /* Update context menu for light theme */
-        [data-theme="light"] #context-menu {
-            background-color: #ffffff;
-            border: 1px solid #e2e8f0;
-            color: #1e293b;
-        }
-
-        [data-theme="light"] .context-menu-item:not(.disabled):hover {
-            background-color: #8b5cf6;
-            color: #ffffff;
-        }
-
-        [data-theme="light"] .context-menu-item.disabled {
-            color: #94a3b8;
-        }
-
-        [data-theme="light"] .context-menu-separator {
-            background-color: #e2e8f0;
-        }
-
-        /* Update toggle switch for light theme */
-        [data-theme="light"] .toggle-switch .slider {
+        [data-theme="light"] #settings-button:disabled {
             background-color: #cbd5e1;
-        }
-
-        [data-theme="light"] .toggle-switch input:checked+.slider {
-            background-color: #8b5cf6;
-        }
-
-        /* Update hamburger menu and sidebar toggle for light theme */
-        [data-theme="light"] .toggle-panel {
-            background: #e2e8f0 !important;
-            color: #1e293b !important;
-            border: 1px solid #cbd5e1 !important;
-        }
-
-        [data-theme="light"] .toggle-panel:hover {
-            background: #cbd5e1 !important;
-            border-color: #94a3b8 !important;
-        }
-
-        [data-theme="light"] .panel-header {
-            background: #f8fafc !important;
-            border-bottom: 1px solid #e2e8f0 !important;
-        }
-
-        [data-theme="light"] .panel-header h3 {
-            color: #1e293b !important;
-        }
-
-        /* Update the collapsed sidebar state */
-        [data-theme="light"] .node-panel.collapsed {
-            background: #f8fafc !important;
-            border: 1px solid #e2e8f0 !important;
-        }
-
-        [data-theme="light"] .node-panel.collapsed .toggle-panel {
-            background: #e2e8f0 !important;
-            color: #1e293b !important;
-            border: 1px solid #cbd5e1 !important;
-        }
-
-        [data-theme="light"] .node-panel.collapsed .toggle-panel:hover {
-            background: #cbd5e1 !important;
-            border-color: #94a3b8 !important;
-        }
-
-        /* Update hamburger icon color */
-        [data-theme="light"] .toggle-panel i {
-            color: #1e293b !important;
-        }
-
-        [data-theme="light"] .toggle-panel:hover i {
-            color: #1e293b !important;
-        }
-
-        /* Override any specific icon colors */
-        [data-theme="light"] .fa-bars {
-            color: #1e293b !important;
-        }
-
-        [data-theme="light"] .fa-chevron-right {
-            color: #1e293b !important;
-        }
-
-        .add-tag-btn:hover {
-            background: #9333ea;
         }
     </style>
 </head>
@@ -1238,23 +1127,6 @@
             <div class="modal-buttons">
                 <button id="cancel-delete" class="modal-button cancel">Cancel</button>
                 <button id="confirm-delete" class="modal-button confirm">Delete</button>
-            </div>
-        </div>
-    </div>
-    <div id="path-condition-modal" class="modal">
-        <div class="modal-content">
-            <h3 class="text-lg font-semibold mb-2">Set Path Condition</h3>
-            <p class="text-gray-400 mb-4">
-                Define the condition that must be met for the workflow to proceed down this path. Leave blank for an
-                unconditional path.
-            </p>
-            <textarea id="path-condition-input"
-                class="w-full h-24 p-2 rounded bg-[#2a2a2a] border border-gray-600 text-white focus:outline-none focus:border-purple-500"
-                placeholder="e.g., user.tag == 'premium'"></textarea>
-            <div class="modal-buttons">
-                <button id="cancel-condition" class="modal-button cancel">Cancel</button>
-                <button id="save-condition" class="modal-button"
-                    style="background-color: var(--brand-color);">Save</button>
             </div>
         </div>
     </div>
@@ -1313,41 +1185,23 @@
         </div>
     </div>
 
-    <div id="channel-bar" class="channel-bar">
-        <button id="toggle-channels" class="toggle-channels">
-            <i class="fas fa-comments"></i>
-        </button>
-        <div class="channel-buttons">
-            <div class="channel-button active" data-channel="all">
-                <i class="fas fa-globe text-lg mb-1"></i>
-                <span class="text-xs">All</span>
-            </div>
-            <div class="channel-button" data-channel="whatsapp">
-                <i class="fab fa-whatsapp text-lg mb-1" style="color: #25D366;"></i>
-                <span class="text-xs">WhatsApp</span>
-            </div>
-            <div class="channel-button" data-channel="instagram">
-                <i class="fab fa-instagram text-lg mb-1" style="color: #E4405F;"></i>
-                <span class="text-xs">Instagram</span>
-            </div>
-            <div class="channel-button" data-channel="facebook">
-                <i class="fab fa-facebook text-lg mb-1" style="color: #1877F2;"></i>
-                <span class="text-xs">Facebook</span>
-            </div>
-            <div class="channel-button" data-channel="telegram">
-                <i class="fab fa-telegram text-lg mb-1" style="color: #0088CC;"></i>
-                <span class="text-xs">Telegram</span>
-            </div>
-            <div class="channel-button" data-channel="email">
-                <i class="fas fa-envelope text-lg mb-1" style="color: #EA4335;"></i>
-                <span class="text-xs">Email</span>
-            </div>
-            <div class="channel-button" data-channel="sms">
-                <i class="fas fa-comment-alt text-lg mb-1" style="color: #34B7F1;"></i>
-                <span class="text-xs">SMS</span>
-            </div>
+    <!-- Settings Panel -->
+    <div id="settings-panel" class="settings-panel">
+        <div class="settings-panel-header">
+            <h3 class="text-lg font-semibold">Node Settings</h3>
+            <button id="close-settings" class="toggle-panel">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="settings-panel-content" id="settings-panel-content">
+            <!-- Settings content will be dynamically populated here -->
         </div>
     </div>
+
+    <!-- Settings Button -->
+    <button id="settings-button" disabled title="Node Settings">
+        <i class="fas fa-cog"></i>
+    </button>
 
     <main id="canvas-container" class="w-full h-full relative workflow-canvas overflow-hidden"
         style="margin-left: 320px;">
@@ -1357,19 +1211,6 @@
         </div>
         <div id="selection-box" class="hidden"></div>
     </main>
-
-    <div class="absolute bottom-4 left-4 flex space-x-2 z-10" style="margin-left: 320px;">
-        <button id="undo-button" class="control-button w-12 h-12 rounded-xl flex items-center justify-center shadow-lg"
-            title="Undo (Ctrl+Z)"><i class="fas fa-undo"></i></button>
-        <button id="redo-button" class="control-button w-12 h-12 rounded-xl flex items-center justify-center shadow-lg"
-            title="Redo (Ctrl+Y)"><i class="fas fa-redo"></i></button>
-        <button id="zoom-in-button"
-            class="control-button w-12 h-12 rounded-xl flex items-center justify-center shadow-lg" title="Zoom In"><i
-                class="fas fa-search-plus"></i></button>
-        <button id="zoom-out-button"
-            class="control-button w-12 h-12 rounded-xl flex items-center justify-center shadow-lg" title="Zoom Out"><i
-                class="fas fa-search-minus"></i></button>
-    </div>
 
     <div id="minimap">
         <div id="minimap-nodes"></div>
@@ -1392,8 +1233,6 @@
             const redoButton = document.getElementById('redo-button');
             const zoomInButton = document.getElementById('zoom-in-button');
             const zoomOutButton = document.getElementById('zoom-out-button');
-            const channelBar = document.getElementById('channel-bar');
-            const toggleChannels = document.getElementById('toggle-channels');
             const nodePanel = document.getElementById('node-panel');
             const togglePanel = document.getElementById('toggle-panel');
             const deleteModal = document.getElementById('delete-modal');
@@ -1401,14 +1240,10 @@
             const deleteModalBody = document.getElementById('delete-modal-body');
             const confirmDelete = document.getElementById('confirm-delete');
             const cancelDelete = document.getElementById('cancel-delete');
-            // Inside: // #region --- ELEMENT SELECTORS ---
-            const pathConditionModal = document.getElementById('path-condition-modal');
-            const saveConditionButton = document.getElementById('save-condition');
-            const cancelConditionButton = document.getElementById('cancel-condition');
-            const pathConditionInput = document.getElementById('path-condition-input');
-
-            // Inside: // #region --- STATE MANAGEMENT ---
-            let editingConnectionIndex = null; // Add this line
+            const settingsPanel = document.getElementById('settings-panel');
+            const settingsButton = document.getElementById('settings-button');
+            const closeSettings = document.getElementById('close-settings');
+            const settingsPanelContent = document.getElementById('settings-panel-content');
             // #endregion
 
             // #region --- STATE MANAGEMENT ---
@@ -1419,6 +1254,7 @@
             let clipboard = [];
             let activeChannel = 'all';
             let nodesToDelete = [];
+            let connectionStartFromLine = null;
 
             let connectionStartConnector = null;
 
@@ -1433,7 +1269,7 @@
             let contextMenuCoords = { x: 0, y: 0 };
             const GRID_SIZE = 20;
             let currentTheme = localStorage.getItem('theme') || 'dark';
-            // Add this to your toggleTheme function
+            
             // Add this to your toggleTheme function
             function toggleTheme() {
                 currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -1512,7 +1348,53 @@
                             advancedSettings: { type: 'textarea', label: 'Advanced Settings', value: '' }
                         }
                     },
-
+                    {
+                        type: 'message',
+                        name: 'Message',
+                        icon: `<i class="fas fa-envelope text-blue-400 text-xl"></i>`,
+                        category: 'communication',
+                        properties: {
+                            mode: {
+                                type: 'select',
+                                label: 'Mode',
+                                value: 'prompt',
+                                options: ['prompt', 'static']
+                            },
+                            content: {
+                                type: 'textarea',
+                                label: 'Content',
+                                value: 'Hello! How can I help you?',
+                                allowVariables: true  // 👈 enables variable insertion
+                            },
+                            variables: {
+                                type: 'multi-select',
+                                label: 'Insert Variables',
+                                options: ['{{user_name}}', '{{date}}', '{{time}}', '{{email}}'],
+                                value: []
+                            }
+                        }
+                    },
+                    {
+                        type: 'call',
+                        name: 'Call',
+                        icon: `<i class="fas fa-phone text-blue-400 text-xl"></i>`,
+                        category: 'communication',
+                        properties: {
+                            duration: { type: 'text', label: 'Duration', value: '30 minutes' },
+                            description: { type: 'textarea', label: 'Description', value: 'Call settings' }
+                        }
+                    },
+                    {
+                        type: 'email',
+                        name: 'Email',
+                        icon: `<i class="fas fa-mail-bulk text-blue-400 text-xl"></i>`,
+                        category: 'communication',
+                        properties: {
+                            subject: { type: 'text', label: 'Subject', value: 'Important Update' },
+                            recipients: { type: 'text', label: 'Recipients', value: 'user@example.com' },
+                            body: { type: 'textarea', label: 'Body', value: 'Dear user,...' }
+                        }
+                    }
 
                 ],
                 control: [
@@ -1791,6 +1673,7 @@
                 attachListeners();
                 updateUndoRedoButtons();
                 renderMinimap();
+                updateSettingsButton();
             }
 
             function getNodeContent(node) {
@@ -1800,243 +1683,210 @@
                 // Special compact layout for start node - no delete button, smaller size
                 if (node.type === 'start') {
                     return `
-            <div class="flex flex-col items-center justify-center h-full p-3">
-                <div class="flex items-center space-x-2 mb-2">
-                    <i class="fas fa-play-circle text-green-400 text-2xl"></i>
+            <div class="flex flex-col items-center justify-center h-full">
+                <div class="flex items-center space-x-2 mb-1">
+                    <i class="fas fa-play-circle text-green-400 text-xl"></i>
                     <div class="text-center">
-                        <h3 class="font-bold text-sm">${node.title}</h3>
+                        <h3 class="font-bold text-xs">${node.title}</h3>
                         <p class="text-xs text-gray-400">Workflow Start</p>
                     </div>
                 </div>
-                <div class="text-xs text-gray-400 text-center mt-1">
-                    Entry Point
-                </div>
             </div>
         `;
                 }
 
-                let content = `
-        <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center space-x-3">
-                ${icon}
-                <div>
-                    <h3 class="font-bold text-md" contenteditable="true" data-field="title" data-node-id="${node.id}">${node.title}</h3>
-                    <p class="text-xs text-gray-400">${nodeDef?.name || node.type}</p>
-                </div>
+                // Compact layout for all other nodes
+                return `
+        <div class="compact-node-header">
+            <div class="flex items-center space-x-2">
+                <div class="compact-node-icon">${icon}</div>
+                <div class="compact-node-title">${node.title}</div>
             </div>
+            <button data-delete-id="${node.id}" class="delete-node-button w-4 h-4 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center text-white text-xs transition-all" title="Delete Node">&times;</button>
         </div>
-    `;
-
-                if (node.type !== 'start') {
-                    content += `<select class="channel-selector" data-node-id="${node.id}">
+        <select class="compact-node-channel channel-selector" data-node-id="${node.id}">
             ${getChannelOptions(node.channel)}
-        </select>`;
-                }
-
-                // Updated two-column layout for conversation node
-                if (node.type === 'conversation') {
-                    content += `
-            <div class="flex gap-3 mt-3">
-                <!-- Left Column - 3 fields stacked -->
-                <div class="flex-1 flex flex-col gap-2">
-                    <div class="node-field">
-                        <label>Purpose</label>
-                        <textarea class="field-value" data-node-id="${node.id}" data-field="purpose" placeholder="Purpose">${node.purpose || nodeDef?.properties.purpose.value || ''}</textarea>
-                    </div>
-                    <div class="node-field">
-                        <label>Context</label>
-                        <textarea class="field-value" data-node-id="${node.id}" data-field="context" placeholder="Context">${node.context || nodeDef?.properties.context.value || ''}</textarea>
-                    </div>
-                    <div class="node-field">
-                        <label>Data Extraction</label>
-                        <textarea class="field-value" data-node-id="${node.id}" data-field="dataExtraction" placeholder="Data Extraction">${node.dataExtraction || nodeDef?.properties.dataExtraction.value || ''}</textarea>
-                    </div>
-                </div>
-                
-                <!-- Right Column - 2 fields stacked -->
-                <div class="flex-1 flex flex-col gap-2">
-                    <div class="node-field h-full">
-                        <label>Data Output</label>
-                        <textarea class="field-value h-full min-h-[100px]" data-node-id="${node.id}" data-field="dataOutput" placeholder="Data Output">${node.dataOutput || nodeDef?.properties.dataOutput.value || ''}</textarea>
-                    </div>
-                    <div class="node-field">
-                        <label>Advanced Settings</label>
-                        <select class="field-value" data-node-id="${node.id}" data-field="advancedSettings">
-                            <option value="default" ${(node.advancedSettings || nodeDef?.properties.advancedSettings.value || '') === 'default' ? 'selected' : ''}>Default Settings</option>
-                            <option value="custom" ${(node.advancedSettings || nodeDef?.properties.advancedSettings.value || '') === 'custom' ? 'selected' : ''}>Custom Settings</option>
-                            <option value="optimized" ${(node.advancedSettings || nodeDef?.properties.advancedSettings.value || '') === 'optimized' ? 'selected' : ''}>Optimized</option>
-                            <option value="minimal" ${(node.advancedSettings || nodeDef?.properties.advancedSettings.value || '') === 'minimal' ? 'selected' : ''}>Minimal</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        `;
-                } else if (nodeDef?.properties) {
-                    Object.keys(nodeDef.properties).forEach(propKey => {
-                        const prop = nodeDef.properties[propKey];
-                        const value = node[propKey] ?? prop.value;
-
-                        let fieldContent = '';
-
-                        if (prop.type === 'textarea') {
-                            fieldContent = `<textarea class="field-value" data-node-id="${node.id}" data-field="${propKey}" placeholder="${prop.label}">${value}</textarea>`;
-                        } else if (prop.type === 'select') {
-                            fieldContent = `<select class="field-value" data-node-id="${node.id}" data-field="${propKey}">`;
-                            prop.options.forEach(option => {
-                                fieldContent += `<option value="${option}" ${value === option ? 'selected' : ''}>${option}</option>`;
-                            });
-                            fieldContent += `</select>`;
-                        } else if (prop.type === 'boolean') {
-                            fieldContent = `
-                    <div class="toggle-switch">
-                        <span>${prop.label}</span>
-                        <label class="switch">
-                            <input type="checkbox" class="field-value" data-node-id="${node.id}" data-field="${propKey}" ${value ? 'checked' : ''}>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                `;
-                        } else if (prop.type === 'date') {
-                            fieldContent = `<input type="text" class="field-value calendar-picker" data-node-id="${node.id}" data-field="${propKey}" value="${value}" placeholder="${prop.label}">`;
-                        } else {
-                            fieldContent = `<input type="${prop.type}" class="field-value" data-node-id="${node.id}" data-field="${propKey}" value="${value}" placeholder="${prop.label}">`;
-                        }
-
-                        content += `
-                <div class="node-field">
-                    ${prop.type !== 'boolean' ? `<label>${prop.label}</label>` : ''}
-                    ${fieldContent}
-                </div>
-            `;
-                    });
-                }
-
-                // Add connection points for path conditions node
-                if (node.type === 'path_conditions') {
-                    content += `
-            <div class="connection-point-container">
-                <div class="connection-point">
-                    <div class="connection-point-label">Yes</div>
-                    <div class="connection-point-dot" data-connector="yes"></div>
-                </div>
-                <div class="connection-point">
-                    <div class="connection-point-label">No</div>
-                    <div class="connection-point-dot" data-connector="no"></div>
-                </div>
-            </div>
-        `;
-                }
-
-                // Add tags section for edit_tags node
-                if (node.type === 'edit_tags') {
-                    content += `
-            <div class="tags-section">
-                <div class="flex items-center justify-between">
-                    <label>Tags</label>
-                    <button class="add-tag-btn">+ Add Tag</button>
-                </div>
-                <div class="tags-list" data-node-id="${node.id}">
-                    ${renderTags(node.tags || [])}
-                </div>
-            </div>
-        `;
-                }
-
-                // Only add delete button for NON-START nodes
-                if (node.type !== 'start') {
-                    content += `
-            <button data-delete-id="${node.id}" class="delete-node-button absolute -top-2 -right-2 w-6 h-6 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center text-white text-sm transition-all" title="Delete Node">&times;</button>
-        `;
-                }
-
-                return content;
-            }
-            function renderTags(tags) {
-                if (!tags || tags.length === 0) {
-                    return '<div class="text-xs text-gray-500 mt-2">No tags added</div>';
-                }
-
-                return tags.map(tag => `
-                    <div class="tag-item">
-                        <div class="tag-color" style="background-color: ${tag.color || '#3B82F6'};"></div>
-                        <input type="text" class="tag-text" value="${tag.name}" placeholder="Tag name">
-                        <input type="text" class="tag-text" value="${tag.description}" placeholder="Description">
-                        <button class="delete-tag text-red-500">&times;</button>
-                    </div>
-                `).join('');
+        </select>
+    `;
             }
 
             function renderConnections() {
                 const svgGroups = state.connections.map((conn, index) => {
                     const fromNode = state.nodes.find(n => n.id === conn.from);
                     const toNode = state.nodes.find(n => n.id === conn.to);
+
+                    // Skip if nodes not found
                     if (!fromNode || !toNode) return '';
 
                     const fromEl = document.getElementById(`node-${fromNode.id}`);
                     const toEl = document.getElementById(`node-${toNode.id}`);
+
+                    // Skip if DOM elements not found
                     if (!fromEl || !toEl) return '';
 
+                    // Use offsetWidth/offsetHeight instead of getBoundingClientRect() - they are not affected by zoom
                     const fromWidth = fromEl.offsetWidth;
                     const fromHeight = fromEl.offsetHeight;
                     const toWidth = toEl.offsetWidth;
                     const toHeight = toEl.offsetHeight;
 
-                    // Determine start point (p1) based on the specific connector used
-                    let p1;
-                    if (conn.connector === 'yes') {
-                        // 'Yes' connector is on the bottom-left of the path_conditions node
-                        p1 = { x: fromNode.x + fromWidth * 0.25, y: fromNode.y + fromHeight };
-                    } else if (conn.connector === 'no') {
-                        // 'No' connector is on the bottom-right of the path_conditions node
-                        p1 = { x: fromNode.x + fromWidth * 0.75, y: fromNode.y + fromHeight };
-                    } else {
-                        // Default output connector is on the right side for all other nodes
-                        p1 = { x: fromNode.x + fromWidth, y: fromNode.y + fromHeight / 2 };
+                    // Calculate connection points using fixed node dimensions
+                    const p1 = {
+                        x: fromNode.x + fromWidth,
+                        y: fromNode.y + fromHeight / 2
+                    };
+                    const p2 = {
+                        x: toNode.x,
+                        y: toNode.y + toHeight / 2
+                    };
+
+                    // Ensure we have valid points
+                    if (isNaN(p1.x) || isNaN(p1.y) || isNaN(p2.x) || isNaN(p2.y)) {
+                        return '';
                     }
 
-                    // The end point (p2) is always the middle of the left side of the target node
-                    const p2 = { x: toNode.x, y: toNode.y + toHeight / 2 };
-
-                    if (isNaN(p1.x) || isNaN(p1.y) || isNaN(p2.x) || isNaN(p2.y)) return '';
-
-                    // Calculate the Bezier curve for the line
                     const offset = Math.max(50, Math.abs(p2.x - p1.x) * 0.5);
-                    const d = `M ${p1.x} ${p1.y} C ${p1.x + offset} ${p1.y}, ${p2.x - offset} ${p2.y}, ${p2.x} ${p2.y}`;
+                    let d = '';
 
-                    // Calculate the midpoint (where t=0.5) of the curve to place the control box
-                    const t = 0.5;
-                    const midX = Math.pow(1 - t, 3) * p1.x + 3 * Math.pow(1 - t, 2) * t * (p1.x + offset) + 3 * (1 - t) * t * t * (p2.x - offset) + Math.pow(t, 3) * p2.x;
-                    const midY = Math.pow(1 - t, 3) * p1.y + 3 * Math.pow(1 - t, 2) * t * p1.y + 3 * (1 - t) * t * t * p2.y + Math.pow(t, 3) * p2.y;
+                    // Handle branch connections
+                    if (conn.branchPoint) {
+                        // This is a branch connection - draw from branch point to target node
+                        const branchX = conn.branchPoint.x;
+                        const branchY = conn.branchPoint.y;
+                        const branchOffset = Math.max(50, Math.abs(p2.x - branchX) * 0.5);
+                        d = `M ${branchX} ${branchY} C ${branchX + branchOffset} ${branchY}, ${p2.x - branchOffset} ${p2.y}, ${p2.x} ${p2.y}`;
+                    } else {
+                        // Regular connection
+                        d = `M ${p1.x} ${p1.y} C ${p1.x + offset} ${p1.y}, ${p2.x - offset} ${p2.y}, ${p2.x} ${p2.y}`;
+                    }
 
-                    // Check if the connection has a condition to change the button's appearance
-                    const hasCondition = conn.condition && conn.condition.trim() !== '';
-                    const conditionIcon = hasCondition ? 'fa-file-alt' : 'fa-code-branch';
-                    const conditionClass = hasCondition ? 'has-condition' : '';
+                    // Calculate multiple points along the curve for connection points
+                    const points = [];
+                    for (let t = 0.25; t < 1; t += 0.25) {
+                        let x, y;
+
+                        if (conn.branchPoint) {
+                            // For branch connections, calculate points along the branch curve
+                            const branchOffset = Math.max(50, Math.abs(p2.x - conn.branchPoint.x) * 0.5);
+                            x = (1 - t) ** 3 * conn.branchPoint.x +
+                                3 * (1 - t) ** 2 * t * (conn.branchPoint.x + branchOffset) +
+                                3 * (1 - t) * t ** 2 * (p2.x - branchOffset) +
+                                t ** 3 * p2.x;
+                            y = (1 - t) ** 3 * conn.branchPoint.y +
+                                3 * (1 - t) ** 2 * t * conn.branchPoint.y +
+                                3 * (1 - t) * t ** 2 * p2.y +
+                                t ** 3 * p2.y;
+                        } else {
+                            // For regular connections
+                            x = (1 - t) ** 3 * p1.x +
+                                3 * (1 - t) ** 2 * t * (p1.x + offset) +
+                                3 * (1 - t) * t ** 2 * (p2.x - offset) +
+                                t ** 3 * p2.x;
+                            y = (1 - t) ** 3 * p1.y +
+                                3 * (1 - t) ** 2 * t * p1.y +
+                                3 * (1 - t) * t ** 2 * p2.y +
+                                t ** 3 * p2.y;
+                        }
+                        points.push({ x, y, t });
+                    }
+
+                    // Create connection points along the curve
+                    const connectionPoints = points.map((point, pointIndex) =>
+                        `<circle cx="${point.x}" cy="${point.y}" r="6" class="connection-point-circle" 
+        data-conn-index="${index}" data-point-index="${pointIndex}" 
+        data-t-value="${point.t}" />`
+                    ).join('');
 
                     return `
-            <g class="connection-group" data-conn-index="${index}">
+            <g class="connection-group">
                 <path d="${d}" class="connection-line" />
                 <path d="${d}" class="connection-hitbox" />
-                <foreignObject x="${midX - 40}" y="${midY - 18}" width="80" height="36">
-                    <div class="connection-controls">
-                        <button data-conn-index="${index}" class="connection-edge-btn condition-btn ${conditionClass}" title="Set Path Condition">
-                            <i class="fas ${conditionIcon}"></i>
-                        </button>
-                        <button data-conn-index="${index}" class="connection-edge-btn delete-btn" title="Delete Connection">
-                            &times;
-                        </button>
-                    </div>
+                ${connectionPoints}
+                <foreignObject x="${points[1].x - 12}" y="${points[1].y - 12}" width="24" height="24">
+                    <button data-conn-index="${index}" class="connection-delete-button">&times;</button>
                 </foreignObject>
             </g>
         `;
                 }).join('');
 
+                const tempLineHTML = tempLine ? tempLine.outerHTML : '';
+                // Clear the SVG canvas
                 svgCanvas.innerHTML = svgGroups;
 
-                // If a new line is actively being drawn, make sure it's visible
+                // If there's a temporary line, add it to the SVG
                 if (tempLine) {
                     svgCanvas.appendChild(tempLine);
                 }
+
+                // Re-attach event listeners for connection points
+                document.querySelectorAll('.connection-point-circle').forEach(circle => {
+                    circle.addEventListener('mousedown', (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+
+                        const connIndex = parseInt(e.target.dataset.connIndex);
+                        const tValue = parseFloat(e.target.dataset.tValue);
+
+                        if (!isNaN(connIndex) && state.connections[connIndex]) {
+                            isDrawingConnection = true;
+                            connectionStartFromLine = {
+                                connIndex: connIndex,
+                                tValue: tValue
+                            };
+
+                            // Calculate the branch point coordinates
+                            const conn = state.connections[connIndex];
+                            const fromNode = state.nodes.find(n => n.id === conn.from);
+                            const toNode = state.nodes.find(n => n.id === conn.to);
+
+                            if (fromNode && toNode) {
+                                const fromEl = document.getElementById(`node-${fromNode.id}`);
+                                const toEl = document.getElementById(`node-${toNode.id}`);
+
+                                if (fromEl && toEl) {
+                                    const fromWidth = fromEl.offsetWidth;
+                                    const fromHeight = fromEl.offsetHeight;
+                                    const toWidth = toEl.offsetWidth;
+                                    const toHeight = toEl.offsetHeight;
+
+                                    const p1 = {
+                                        x: fromNode.x + fromWidth,
+                                        y: fromNode.y + fromHeight / 2
+                                    };
+                                    const p2 = {
+                                        x: toNode.x,
+                                        y: toNode.y + toHeight / 2
+                                    };
+
+                                    const offset = Math.max(50, Math.abs(p2.x - p1.x) * 0.5);
+
+                                    // Calculate the exact branch point on the curve
+                                    const branchX = (1 - tValue) ** 3 * p1.x +
+                                        3 * (1 - tValue) ** 2 * tValue * (p1.x + offset) +
+                                        3 * (1 - tValue) * tValue ** 2 * (p2.x - offset) +
+                                        tValue ** 3 * p2.x;
+                                    const branchY = (1 - tValue) ** 3 * p1.y +
+                                        3 * (1 - tValue) ** 2 * tValue * p1.y +
+                                        3 * (1 - tValue) * tValue ** 2 * p2.y +
+                                        tValue ** 3 * p2.y;
+
+                                    // Store the branch coordinates
+                                    connectionStartFromLine.branchX = branchX;
+                                    connectionStartFromLine.branchY = branchY;
+                                }
+                            }
+
+                            // Create a properly styled temporary line
+                            tempLine = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                            tempLine.setAttribute('class', 'connection-line');
+                            tempLine.setAttribute('stroke', 'var(--brand-color)');
+                            tempLine.setAttribute('stroke-width', '3');
+                            tempLine.setAttribute('fill', 'none');
+                            tempLine.setAttribute('stroke-dasharray', '5,5'); // Make it dashed to distinguish from permanent lines
+                            svgCanvas.appendChild(tempLine);
+                        }
+                    });
+                });
             }
 
             function renderMinimap() {
@@ -2050,8 +1900,8 @@
                 const bounds = state.nodes.reduce((b, n) => ({
                     minX: Math.min(b.minX, n.x),
                     minY: Math.min(b.minY, n.y),
-                    maxX: Math.max(b.maxX, n.x + 280),
-                    maxY: Math.max(b.maxY, n.y + 280),
+                    maxX: Math.max(b.maxX, n.x + 180),
+                    maxY: Math.max(b.maxY, n.y + 80),
                 }), { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity });
 
                 const contentWidth = bounds.maxX - bounds.minX;
@@ -2063,7 +1913,7 @@
                 minimapNodes.innerHTML = state.nodes.map(node => {
                     const x = (node.x - bounds.minX) * mapScale;
                     const y = (node.y - bounds.minY) * mapScale;
-                    return `<div class="minimap-node ${selectedNodeIds.has(node.id) ? 'selected' : ''}" style="left: ${x}px; top: ${y}px; width: ${280 * mapScale}px; height: ${280 * mapScale}px;"></div>`;
+                    return `<div class="minimap-node ${selectedNodeIds.has(node.id) ? 'selected' : ''}" style="left: ${x}px; top: ${y}px; width: ${180 * mapScale}px; height: ${80 * mapScale}px;"></div>`;
                 }).join('');
 
                 const viewRect = canvasContainer.getBoundingClientRect();
@@ -2113,80 +1963,6 @@
                             showDeleteModal(nodeId);
                         });
                     }
-                    const titleEl = el.querySelector('h3[data-field="title"]');
-                    if (titleEl) {
-                        titleEl.addEventListener('blur', handleFieldChange);
-                        titleEl.addEventListener('keydown', (e) => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                e.target.blur();
-                            }
-                        });
-                    }
-
-                    // Initialize calendar picker for booking nodes
-                    // Initialize calendar picker for booking nodes
-                    const calendarPicker = el.querySelector('.calendar-picker');
-                    if (calendarPicker) {
-                        flatpickr(calendarPicker, {
-                            dateFormat: "Y-m-d",
-                            allowInput: true,
-                            theme: currentTheme // Use current theme
-                        });
-                    }
-                    // Handle add tag button for edit_tags nodes
-                    const addTagBtn = el.querySelector('.add-tag-btn');
-                    if (addTagBtn) {
-                        addTagBtn.addEventListener('click', () => {
-                            const node = state.nodes.find(n => n.id === nodeId);
-                            if (!node.tags) node.tags = [];
-                            node.tags.push({ name: '', description: '', color: '#3B82F6' });
-                            saveState();
-                            render();
-                        });
-                    }
-
-                    // Handle tag deletion
-                    el.querySelectorAll('.delete-tag').forEach(btn => {
-                        btn.addEventListener('click', (e) => {
-                            const node = state.nodes.find(n => n.id === nodeId);
-                            const tagItem = e.target.closest('.tag-item');
-                            const tagIndex = Array.from(tagItem.parentNode.children).indexOf(tagItem);
-                            if (node.tags && node.tags[tagIndex]) {
-                                node.tags.splice(tagIndex, 1);
-                                saveState();
-                                render();
-                            }
-                        });
-                    });
-
-                    // Handle tag input changes
-                    el.querySelectorAll('.tag-text').forEach(input => {
-                        input.addEventListener('change', (e) => {
-                            const node = state.nodes.find(n => n.id === nodeId);
-                            const tagItem = e.target.closest('.tag-item');
-                            const tagIndex = Array.from(tagItem.parentNode.children).indexOf(tagItem);
-                            const field = e.target.classList.contains('tag-text') &&
-                                Array.from(tagItem.querySelectorAll('.tag-text')).indexOf(e.target);
-
-                            if (node.tags && node.tags[tagIndex]) {
-                                if (field === 0) {
-                                    node.tags[tagIndex].name = e.target.value;
-                                } else if (field === 1) {
-                                    node.tags[tagIndex].description = e.target.value;
-                                }
-                                saveState();
-                            }
-                        });
-                    });
-
-                    // Handle path conditions connectors
-                    el.querySelectorAll('.connection-point-dot').forEach(dot => {
-                        dot.addEventListener('mousedown', (e) => {
-                            e.stopPropagation();
-                            onConnectorMouseDown(e, nodeId, e.target.dataset.connector);
-                        });
-                    });
 
                     // Add connectors based on node type
                     if (node.type !== 'start') {
@@ -2345,34 +2121,117 @@
                 saveState();
                 render();
             }
-            // #region --- PATH CONDITION POPUP ---
-            function showPathConditionPopup(connIndex) {
-                editingConnectionIndex = connIndex;
-                const connection = state.connections[editingConnectionIndex];
-                if (connection) {
-                    pathConditionInput.value = connection.condition || '';
-                    pathConditionModal.style.display = 'flex';
-                    pathConditionInput.focus();
-                }
-            }
-
-            function hidePathConditionPopup() {
-                pathConditionModal.style.display = 'none';
-                editingConnectionIndex = null;
-            }
-
-            function savePathCondition() {
-                if (editingConnectionIndex !== null) {
-                    const connection = state.connections[editingConnectionIndex];
-                    if (connection) {
-                        connection.condition = pathConditionInput.value.trim();
-                        saveState();
-                        render(); // Re-render to update the button icon
-                    }
-                }
-                hidePathConditionPopup();
-            }
             // #endregion
+
+            // #region --- SETTINGS PANEL ---
+            function updateSettingsButton() {
+                // Enable settings button if exactly one node is selected
+                settingsButton.disabled = selectedNodeIds.size !== 1;
+            }
+
+            function openSettingsPanel() {
+                if (selectedNodeIds.size !== 1) return;
+                
+                const nodeId = Array.from(selectedNodeIds)[0];
+                const node = state.nodes.find(n => n.id === nodeId);
+                if (!node) return;
+                
+                // Populate settings panel with node properties
+                settingsPanelContent.innerHTML = renderSettingsForNode(node);
+                
+                // Open the panel
+                settingsPanel.classList.add('open');
+                
+                // Attach event listeners to settings fields
+                attachSettingsListeners(nodeId);
+            }
+
+            function closeSettingsPanel() {
+                settingsPanel.classList.remove('open');
+            }
+
+            function renderSettingsForNode(node) {
+                const nodeDef = Object.values(nodeTypes).flat().find(n => n.type === node.type);
+                if (!nodeDef || !nodeDef.properties) return '<p class="text-gray-400">No settings available for this node type.</p>';
+                
+                let content = `<h3 class="text-lg font-semibold mb-4">${node.title} Settings</h3>`;
+                
+                Object.keys(nodeDef.properties).forEach(propKey => {
+                    const prop = nodeDef.properties[propKey];
+                    const value = node[propKey] ?? prop.value;
+
+                    let fieldContent = '';
+
+                    if (prop.type === 'textarea') {
+                        fieldContent = `<textarea class="field-value w-full" data-node-id="${node.id}" data-field="${propKey}" placeholder="${prop.label}">${value}</textarea>`;
+                    } else if (prop.type === 'select') {
+                        fieldContent = `<select class="field-value w-full" data-node-id="${node.id}" data-field="${propKey}">`;
+                        prop.options.forEach(option => {
+                            fieldContent += `<option value="${option}" ${value === option ? 'selected' : ''}>${option}</option>`;
+                        });
+                        fieldContent += `</select>`;
+                    } else if (prop.type === 'boolean') {
+                        fieldContent = `
+                    <div class="toggle-switch">
+                        <span>${prop.label}</span>
+                        <label class="switch">
+                            <input type="checkbox" class="field-value" data-node-id="${node.id}" data-field="${propKey}" ${value ? 'checked' : ''}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                `;
+                    } else if (prop.type === 'date') {
+                        fieldContent = `<input type="text" class="field-value calendar-picker w-full" data-node-id="${node.id}" data-field="${propKey}" value="${value}" placeholder="${prop.label}">`;
+                    } else {
+                        fieldContent = `<input type="${prop.type}" class="field-value w-full" data-node-id="${node.id}" data-field="${propKey}" value="${value}" placeholder="${prop.label}">`;
+                    }
+
+                    content += `
+                <div class="node-field">
+                    ${prop.type !== 'boolean' ? `<label>${prop.label}</label>` : ''}
+                    ${fieldContent}
+                </div>
+            `;
+                });
+                
+                return content;
+            }
+
+            function attachSettingsListeners(nodeId) {
+                settingsPanelContent.querySelectorAll('.field-value').forEach(field => {
+                    if (field.type === 'checkbox') {
+                        field.addEventListener('change', handleSettingsFieldChange);
+                    } else {
+                        field.addEventListener('change', handleSettingsFieldChange);
+                        field.addEventListener('input', handleSettingsFieldChange);
+                    }
+                });
+                
+                // Initialize calendar pickers
+                settingsPanelContent.querySelectorAll('.calendar-picker').forEach(picker => {
+                    flatpickr(picker, {
+                        dateFormat: "Y-m-d",
+                        allowInput: true,
+                        theme: currentTheme
+                    });
+                });
+            }
+
+            function handleSettingsFieldChange(e) {
+                const field = e.target;
+                const nodeId = parseInt(field.dataset.nodeId);
+                const fieldName = field.dataset.field;
+                const node = state.nodes.find(n => n.id === nodeId);
+
+                if (node) {
+                    if (field.type === 'checkbox') {
+                        node[fieldName] = field.checked;
+                    } else {
+                        node[fieldName] = field.value;
+                    }
+                    saveState();
+                }
+            }
             // #endregion
 
             // #region --- EVENT HANDLERS ---
@@ -2435,38 +2294,78 @@
                 if (isDraggingNode) {
                     selectedNodeIds.forEach(id => {
                         const node = state.nodes.find(n => n.id === id);
-                        // Prevent dragging the start node
-                        if (node.type !== 'start') {
-                            node.x = snapToGrid(node.dragStart.x + (mousePos.x - dragOffset.x - node.dragStart.x));
-                            node.y = snapToGrid(node.dragStart.y + (mousePos.y - dragOffset.y - node.dragStart.y));
-                        }
+                        node.x = snapToGrid(node.dragStart.x + (mousePos.x - dragOffset.x - node.dragStart.x));
+                        node.y = snapToGrid(node.dragStart.y + (mousePos.y - dragOffset.y - node.dragStart.y));
                     });
                     render();
                 } else if (isDrawingConnection) {
-                    // This block now only handles drawing from a node connector
-                    const startNode = state.nodes.find(n => n.id === connectionStartNodeId);
-                    if (startNode && tempLine) {
-                        const startEl = document.getElementById(`node-${startNode.id}`);
-                        if (startEl) {
-                            const startWidth = startEl.offsetWidth;
-                            const startHeight = startEl.offsetHeight;
+                    if (connectionStartFromLine) {
+                        // Drawing from connection point
+                        const conn = state.connections[connectionStartFromLine.connIndex];
+                        const fromNode = state.nodes.find(n => n.id === conn.from);
+                        const toNode = state.nodes.find(n => n.id === conn.to);
 
-                            // Determine start point based on the specific connector if available
-                            let p1;
-                            if (connectionStartConnector === 'yes') {
-                                p1 = { x: startNode.x + startWidth * 0.25, y: startNode.y + startHeight };
-                            } else if (connectionStartConnector === 'no') {
-                                p1 = { x: startNode.x + startWidth * 0.75, y: startNode.y + startHeight };
-                            } else {
-                                // Default output connector on the right side
-                                p1 = { x: startNode.x + startWidth, y: startNode.y + startHeight / 2 };
+                        if (fromNode && toNode) {
+                            const fromEl = document.getElementById(`node-${fromNode.id}`);
+                            const toEl = document.getElementById(`node-${toNode.id}`);
+
+                            if (fromEl && toEl) {
+                                const fromWidth = fromEl.offsetWidth;
+                                const fromHeight = fromEl.offsetHeight;
+                                const toWidth = toEl.offsetWidth;
+                                const toHeight = toEl.offsetHeight;
+
+                                const p1 = {
+                                    x: fromNode.x + fromWidth,
+                                    y: fromNode.y + fromHeight / 2
+                                };
+                                const p2 = {
+                                    x: toNode.x,
+                                    y: toNode.y + toHeight / 2
+                                };
+                                const offset = Math.max(50, Math.abs(p2.x - p1.x) * 0.5);
+
+                                // Calculate start point on the curve
+                                const startX = (1 - connectionStartFromLine.tValue) ** 3 * p1.x +
+                                    3 * (1 - connectionStartFromLine.tValue) ** 2 * connectionStartFromLine.tValue * (p1.x + offset) +
+                                    3 * (1 - connectionStartFromLine.tValue) * connectionStartFromLine.tValue ** 2 * (p2.x - offset) +
+                                    connectionStartFromLine.tValue ** 3 * p2.x;
+                                const startY = (1 - connectionStartFromLine.tValue) ** 3 * p1.y +
+                                    3 * (1 - connectionStartFromLine.tValue) ** 2 * connectionStartFromLine.tValue * p1.y +
+                                    3 * (1 - connectionStartFromLine.tValue) * connectionStartFromLine.tValue ** 2 * p2.y +
+                                    connectionStartFromLine.tValue ** 3 * p2.y;
+
+                                // Store the branch position for later use
+                                connectionStartFromLine.branchX = startX;
+                                connectionStartFromLine.branchY = startY;
+
+                                const endX = mousePos.x;
+                                const endY = mousePos.y;
+                                const newOffset = Math.max(50, Math.abs(endX - startX) * 0.5);
+                                const d = `M ${startX} ${startY} C ${startX + newOffset} ${startY}, ${endX - newOffset} ${endY}, ${endX} ${endY}`;
+                                tempLine.setAttribute('d', d);
                             }
+                        }
+                    } else {
+                        // Drawing from node connector
+                        const startNode = state.nodes.find(n => n.id === connectionStartNodeId);
+                        if (startNode) {
+                            const startEl = document.getElementById(`node-${startNode.id}`);
+                            if (startEl) {
+                                const startWidth = startEl.offsetWidth;
+                                const startHeight = startEl.offsetHeight;
 
-                            const endX = mousePos.x;
-                            const endY = mousePos.y;
-                            const offset = Math.max(50, Math.abs(endX - p1.x) * 0.5);
-                            const d = `M ${p1.x} ${p1.y} C ${p1.x + offset} ${p1.y}, ${endX - offset} ${endY}, ${endX} ${endY}`;
-                            tempLine.setAttribute('d', d);
+                                const p1 = {
+                                    x: startNode.x + startWidth,
+                                    y: startNode.y + startHeight / 2
+                                };
+
+                                const endX = mousePos.x;
+                                const endY = mousePos.y;
+                                const offset = Math.max(50, Math.abs(endX - p1.x) * 0.5);
+                                const d = `M ${p1.x} ${p1.y} C ${p1.x + offset} ${p1.y}, ${endX - offset} ${endY}, ${endX} ${endY}`;
+                                tempLine.setAttribute('d', d);
+                            }
                         }
                     }
                 }
@@ -2483,41 +2382,49 @@
                     saveState();
                 }
                 if (isDrawingConnection) {
-                    // Allow dropping the connection anywhere on a valid target node
-                    const endNodeEl = e.target.closest('.node');
+                    const endConnector = e.target.closest('.node-connector');
 
-                    if (endNodeEl) {
-                        const endNodeId = parseInt(endNodeEl.id.split('-')[1]);
-                        const endNode = state.nodes.find(n => n.id === endNodeId);
+                    if (connectionStartFromLine && endConnector) {
+                        // Completing connection from edge point to a node
+                        const endNodeId = parseInt(endConnector.parentElement.id.split('-')[1]);
+                        const conn = state.connections[connectionStartFromLine.connIndex];
 
-                        // A connection is valid if it's not to the same node and the target is not the 'start' node
-                        if (endNode && connectionStartNodeId !== endNodeId && endNode.type !== 'start') {
-                            // Check for duplicate connections
-                            const alreadyExists = state.connections.some(c =>
-                                c.from === connectionStartNodeId &&
-                                c.to === endNodeId &&
-                                c.connector === connectionStartConnector
-                            );
-
-                            if (!alreadyExists) {
-                                state.connections.push({
-                                    from: connectionStartNodeId,
-                                    to: endNodeId,
-                                    connector: connectionStartConnector,
-                                    condition: '' // Initialize with an empty condition
-                                });
-                                saveState();
-                            }
+                        if (conn.from !== endNodeId && conn.to !== endNodeId) {
+                            // Create a new connection that branches from the existing connection
+                            // Store the branch point coordinates
+                            state.connections.push({
+                                from: conn.from,
+                                to: endNodeId,
+                                connector: conn.connector,
+                                branchPoint: {
+                                    x: connectionStartFromLine.branchX,
+                                    y: connectionStartFromLine.branchY,
+                                    tValue: connectionStartFromLine.tValue,
+                                    originalConnIndex: connectionStartFromLine.connIndex
+                                }
+                            });
+                            saveState();
+                        }
+                    } else if (endConnector) {
+                        // Original connection completion from node to node
+                        const endNodeId = parseInt(endConnector.parentElement.id.split('-')[1]);
+                        if (connectionStartNodeId !== endNodeId) {
+                            state.connections.push({
+                                from: connectionStartNodeId,
+                                to: endNodeId,
+                                connector: connectionStartConnector
+                            });
+                            saveState();
                         }
                     }
 
-                    // Cleanup after drawing attempt (successful or not)
                     if (tempLine) tempLine.remove();
                     isDrawingConnection = false;
                     connectionStartNodeId = null;
                     connectionStartConnector = null;
+                    connectionStartFromLine = null;
                     tempLine = null;
-                    render(); // Re-render to show the new connection or remove the temp line
+                    render();
                 }
                 if (isSelecting) {
                     const rect = selectionBox.getBoundingClientRect();
@@ -2551,6 +2458,7 @@
                     render();
                 }
             }
+
             function handleKeyDown(e) {
                 if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT') return;
 
@@ -2565,9 +2473,7 @@
             }
 
             function handleCanvasMouseDown(e) {
-                // Add '.connection-controls' to the list of things to ignore
-                if (e.target.closest('.node, .control-button, #minimap, .node-panel, .channel-bar, .connection-controls')) return;
-
+                if (e.target.closest('.node, .control-button, #minimap, .node-panel, .settings-panel, #settings-button')) return;
                 hideContextMenu();
 
                 if (e.button === 0 && e.target.closest('.workflow-canvas')) {
@@ -2668,7 +2574,7 @@
             const hideContextMenu = () => contextMenu.classList.add('hidden');
             // #endregion
 
-            // #region --- NODE PANEL & CHANNEL BAR ---
+            // #region --- NODE PANEL ---
             function setupNodePanel() {
                 // Populate category nodes
                 Object.keys(nodeTypes).forEach(category => {
@@ -2735,45 +2641,25 @@
                     }
                 });
             }
+            // #endregion
 
-            function setupChannelBar() {
-                toggleChannels.addEventListener('click', () => {
-                    channelBar.classList.toggle('collapsed');
-                    const icon = toggleChannels.querySelector('i');
-                    icon.classList.toggle('fa-comments');
-                    icon.classList.toggle('fa-chevron-left');
+            // #region --- SETTINGS PANEL SETUP ---
+            function setupSettingsPanel() {
+                // Settings button click handler
+                settingsButton.addEventListener('click', () => {
+                    if (settingsButton.disabled) return;
+                    openSettingsPanel();
                 });
-
-                document.querySelectorAll('.channel-button').forEach(button => {
-                    button.addEventListener('click', () => {
-                        document.querySelectorAll('.channel-button').forEach(btn => btn.classList.remove('active'));
-                        button.classList.add('active');
-                        activeChannel = button.dataset.channel;
-                        render();
-                    });
-                });
-            }
-
-            function setupModal() {
-                confirmDelete.addEventListener('click', () => {
-                    if (nodesToDelete.length > 0) {
-                        nodesToDelete.forEach(id => {
-                            const nodeIndex = state.nodes.findIndex(n => n.id === id);
-                            if (nodeIndex > -1) {
-                                state.nodes.splice(nodeIndex, 1);
-                                state.connections = state.connections.filter(c => c.from !== id && c.to !== id);
-                            }
-                        });
-                        saveState();
-                        render();
-                    }
-                    hideDeleteModal();
-                });
-
-                cancelDelete.addEventListener('click', hideDeleteModal);
-                deleteModal.addEventListener('click', (e) => {
-                    if (e.target === deleteModal) {
-                        hideDeleteModal();
+                
+                // Close settings button
+                closeSettings.addEventListener('click', closeSettingsPanel);
+                
+                // Close settings panel when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (settingsPanel.classList.contains('open') && 
+                        !settingsPanel.contains(e.target) && 
+                        e.target !== settingsButton) {
+                        closeSettingsPanel();
                     }
                 });
             }
@@ -2782,11 +2668,12 @@
             // #region --- INITIALIZATION ---
             function init() {
                 setupNodePanel();
-                setupChannelBar();
+                setupSettingsPanel();
                 setupModal();
-
+                // Initialize theme
                 document.documentElement.setAttribute('data-theme', currentTheme);
 
+                // Set initial theme icon
                 const themeIcon = document.querySelector('#theme-toggle i');
                 if (currentTheme === 'dark') {
                     themeIcon.className = 'fas fa-moon';
@@ -2796,34 +2683,20 @@
                     themeIcon.title = 'Switch to Dark Mode';
                 }
 
-                // --- EVENT LISTENERS ---
-
+                // Add theme toggle event listener
                 document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
 
-                // UPDATED: Use 'mousedown' for better response and stop propagation
                 svgCanvas.addEventListener('mousedown', e => {
-                    const conditionButton = e.target.closest('.condition-btn');
-                    const deleteButton = e.target.closest('.delete-btn');
-
-                    if (conditionButton) {
-                        e.stopPropagation(); // Prevent canvas panning
-                        const connIndex = parseInt(conditionButton.dataset.connIndex);
-                        showPathConditionPopup(connIndex);
-                        return;
-                    }
-
-                    if (deleteButton) {
-                        e.stopPropagation(); // Prevent canvas panning
-                        const connIndex = parseInt(deleteButton.dataset.connIndex);
+                    if (e.target.classList.contains('connection-delete-button')) {
+                        e.stopPropagation();
+                        const connIndex = parseInt(e.target.dataset.connIndex);
                         if (!isNaN(connIndex) && state.connections[connIndex]) {
                             state.connections.splice(connIndex, 1);
                             saveState();
                             render();
                         }
-                        return;
                     }
                 });
-
                 canvasContainer.addEventListener('mousedown', handleCanvasMouseDown);
                 window.addEventListener('mousemove', handleMouseMove);
                 window.addEventListener('mouseup', handleMouseUp);
@@ -2832,46 +2705,40 @@
                 document.addEventListener('click', (e) => {
                     if (!e.target.closest('#context-menu')) hideContextMenu();
                 });
-
-                saveConditionButton.addEventListener('click', savePathCondition);
-                cancelConditionButton.addEventListener('click', hidePathConditionPopup);
-                pathConditionModal.addEventListener('click', (e) => {
-                    if (e.target === pathConditionModal) {
-                        hidePathConditionPopup();
-                    }
-                });
-
                 canvasContainer.addEventListener('wheel', e => {
                     e.preventDefault();
                     const zoomFactor = 1.1;
                     const oldScale = scale;
                     scale *= e.deltaY > 0 ? 1 / zoomFactor : zoomFactor;
                     scale = Math.max(0.1, Math.min(5, scale));
-                    const rect = canvasContainer.getBoundingClientRect();
-                    const mouseX = e.clientX - rect.left;
-                    const mouseY = e.clientY - rect.top;
+                    const mouseX = e.clientX - canvasContainer.offsetLeft;
+                    const mouseY = e.clientY - canvasContainer.offsetTop;
                     pan.x = mouseX - (mouseX - pan.x) * (scale / oldScale);
                     pan.y = mouseY - (mouseY - pan.y) * (scale / oldScale);
                     applyTransform();
-                    renderConnections();
+                    renderConnections(); // Add this line to re-render connections after zoom
                 }, { passive: false });
 
+
+                // UI Buttons
                 undoButton.addEventListener('click', undo);
                 redoButton.addEventListener('click', redo);
                 zoomInButton.addEventListener('click', () => {
                     scale = Math.min(5, scale * 1.2);
                     applyTransform();
-                    renderConnections();
+                    renderConnections(); // Add this line
                 });
+
                 zoomOutButton.addEventListener('click', () => {
                     scale = Math.max(0.1, scale / 1.2);
                     applyTransform();
-                    renderConnections();
+                    renderConnections(); // Add this line
                 });
-
+                // Initial load
                 loadState();
                 render();
             }
+
             init();
         });
     </script>
