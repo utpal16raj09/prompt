@@ -986,12 +986,14 @@
                 </div>
                 <div id="custom-condition-section" class="node-field hidden">
                     <label>Custom Condition</label>
-                    <textarea id="custom-condition" class="field-value" placeholder="e.g., user.tag == 'premium' AND channel == 'whatsapp'"></textarea>
+                    <textarea id="custom-condition" class="field-value"
+                        placeholder="e.g., user.tag == 'premium' AND channel == 'whatsapp'"></textarea>
                 </div>
             </div>
             <div class="modal-buttons">
                 <button id="cancel-condition" class="modal-button cancel">Cancel</button>
-                <button id="save-condition" class="modal-button" style="background-color: var(--brand-color);">Save Condition</button>
+                <button id="save-condition" class="modal-button" style="background-color: var(--brand-color);">Save
+                    Condition</button>
             </div>
         </div>
     </div>
@@ -1542,27 +1544,31 @@
                 updateUndoRedoButtons();
                 renderMinimap();
             }
-
             function getNodeContent(node) {
                 const nodeDef = Object.values(nodeTypes).flat().find(n => n.type === node.type);
                 const icon = nodeDef?.icon || `<i class="fas fa-cube text-gray-400 text-xl"></i>`;
 
+                // Special compact layout for start node
                 // Special compact layout for start node - no delete button, smaller size
                 if (node.type === 'start') {
                     return `
-            <div class="flex flex-col items-center justify-center h-full p-3">
-                <div class="flex items-center space-x-2 mb-2">
-                    <i class="fas fa-play-circle text-green-400 text-2xl"></i>
-                    <div class="text-center">
-                        <h3 class="font-bold text-sm">${node.title}</h3>
-                        <p class="text-xs text-gray-400">Workflow Start</p>
-                    </div>
-                </div>
-                <div class="text-xs text-gray-400 text-center mt-1">
-                    Entry Point
+        <div class="flex flex-col items-center justify-center h-full p-3">
+            <div class="flex items-center space-x-2 mb-2">
+                <i class="fas fa-play-circle text-green-400 text-2xl"></i>
+                <div class="text-center">
+                    <h3 class="font-bold text-sm">${node.title}</h3>
+                    <p class="text-xs text-gray-400">Workflow Start</p>
                 </div>
             </div>
-        `;
+            <div class="text-xs text-gray-400 text-center mt-1">
+                Entry Point
+            </div>
+            <!-- Add output connector to start node -->
+            <div class="compact-node-connectors">
+                <div class="compact-node-connector out" data-connector="out"></div>
+            </div>
+        </div>
+    `;
                 }
 
                 // Compact layout for all other nodes
@@ -1695,23 +1701,23 @@
             // #region --- SETTINGS PANEL ---
             function updateSettingsPanel(node) {
                 const nodeDef = Object.values(nodeTypes).flat().find(n => n.type === node.type);
-                
+
                 if (!nodeDef) {
                     hideNodeSettings();
                     return;
                 }
-                
+
                 let settingsHTML = `
                     <h4 class="font-semibold mb-4">${nodeDef.name} Settings</h4>
                 `;
-                
+
                 if (nodeDef.properties) {
                     Object.keys(nodeDef.properties).forEach(propKey => {
                         const prop = nodeDef.properties[propKey];
                         const value = node[propKey] ?? prop.value;
-                        
+
                         let fieldHTML = '';
-                        
+
                         if (prop.type === 'textarea') {
                             fieldHTML = `
                                 <div class="node-field">
@@ -1757,15 +1763,15 @@
                                 </div>
                             `;
                         }
-                        
+
                         settingsHTML += fieldHTML;
                     });
                 }
-                
+
                 nodeSettings.innerHTML = settingsHTML;
                 noNodeSelected.classList.add('hidden');
                 nodeSettings.classList.remove('hidden');
-                
+
                 // Attach event listeners to settings fields
                 nodeSettings.querySelectorAll('.settings-field').forEach(field => {
                     if (field.type === 'checkbox') {
@@ -1776,18 +1782,18 @@
                     }
                 });
             }
-            
+
             function hideNodeSettings() {
                 noNodeSelected.classList.remove('hidden');
                 nodeSettings.classList.add('hidden');
             }
-            
+
             function handleSettingsFieldChange(e) {
                 const field = e.target;
                 const nodeId = parseInt(field.dataset.nodeId);
                 const fieldName = field.dataset.field;
                 const node = state.nodes.find(n => n.id === nodeId);
-                
+
                 if (node) {
                     if (field.type === 'checkbox') {
                         node[fieldName] = field.checked;
@@ -1797,12 +1803,12 @@
                     saveState();
                 }
             }
-            
+
             function openSettingsPanel(node) {
                 updateSettingsPanel(node);
                 settingsPanel.classList.add('open');
             }
-            
+
             function closeSettingsPanel() {
                 settingsPanel.classList.remove('open');
             }
@@ -1814,7 +1820,7 @@
                     const node = state.nodes.find(n => n.id === nodeId);
 
                     el.addEventListener('mousedown', e => onNodeMouseDown(e, nodeId));
-                    
+
                     // Add double-click listener for opening settings
                     el.addEventListener('dblclick', (e) => {
                         e.stopPropagation();
@@ -1972,7 +1978,7 @@
             function showPathConditionPopup(connIndex) {
                 editingConnectionIndex = connIndex;
                 const connection = state.connections[editingConnectionIndex];
-                
+
                 // Reset form
                 conditionTypeSelect.value = 'data';
                 dataFieldInput.value = '';
@@ -1980,15 +1986,15 @@
                 dataValueInput.value = '';
                 channelValueSelect.value = 'whatsapp';
                 customConditionTextarea.value = '';
-                
+
                 // Show/hide sections based on condition type
                 updateConditionSections();
-                
+
                 // Load existing condition if any
                 if (connection && connection.condition) {
                     const condition = connection.condition;
                     conditionTypeSelect.value = condition.type || 'data';
-                    
+
                     if (condition.type === 'data') {
                         dataFieldInput.value = condition.field || '';
                         dataOperatorSelect.value = condition.operator || 'equals';
@@ -1998,24 +2004,24 @@
                     } else if (condition.type === 'custom') {
                         customConditionTextarea.value = condition.expression || '';
                     }
-                    
+
                     updateConditionSections();
                 }
-                
+
                 pathConditionModal.style.display = 'flex';
                 dataFieldInput.focus();
             }
 
             function updateConditionSections() {
                 const conditionType = conditionTypeSelect.value;
-                
+
                 // Hide all sections first
                 dataConditionSection.classList.add('hidden');
                 dataOperatorSection.classList.add('hidden');
                 dataValueSection.classList.add('hidden');
                 channelConditionSection.classList.add('hidden');
                 customConditionSection.classList.add('hidden');
-                
+
                 // Show relevant sections based on condition type
                 if (conditionType === 'data') {
                     dataConditionSection.classList.remove('hidden');
@@ -2039,7 +2045,7 @@
                     if (connection) {
                         const conditionType = conditionTypeSelect.value;
                         let condition = { type: conditionType };
-                        
+
                         if (conditionType === 'data') {
                             condition.field = dataFieldInput.value.trim();
                             condition.operator = dataOperatorSelect.value;
@@ -2049,7 +2055,7 @@
                         } else if (conditionType === 'custom') {
                             condition.expression = customConditionTextarea.value.trim();
                         }
-                        
+
                         connection.condition = condition;
                         saveState();
                         render(); // Re-render to update the button icon
@@ -2455,10 +2461,10 @@
 
             function setupSettingsPanel() {
                 closeSettings.addEventListener('click', closeSettingsPanel);
-                
+
                 // Close settings panel when clicking outside
                 document.addEventListener('click', (e) => {
-                    if (!e.target.closest('#settings-panel') && 
+                    if (!e.target.closest('#settings-panel') &&
                         settingsPanel.classList.contains('open')) {
                         closeSettingsPanel();
                     }
