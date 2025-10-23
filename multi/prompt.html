@@ -332,100 +332,187 @@
             z-index: 100;
         }
 
-        /* Node Panel - Left Side */
+        /* === Workflow Sidebar (Exact Image Style) === */
         .node-panel {
             position: absolute;
-            left: 20px;
-            top: 20px;
-            bottom: 20px;
-            width: 280px;
-            background: #1a1a1a;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            z-index: 20;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 300px;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            background: radial-gradient(100% 100% at 0% 0%, rgba(25, 0, 45, 0.9) 0%, rgba(5, 0, 15, 0.95) 100%);
+            border-right: 1px solid rgba(164, 75, 255, 0.2);
+            box-shadow: 0 0 60px rgba(164, 75, 255, 0.15);
+            backdrop-filter: blur(25px);
+            z-index: 50;
+            border-top-right-radius: 18px;
+            border-bottom-right-radius: 18px;
+            padding: 24px 20px;
+            transition: all 0.4s ease;
+            color: #fff;
+        }
+
+        /* --- Glowing edge line --- */
+        .node-panel::after {
+            content: "";
+            position: absolute;
+            right: -2px;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(164, 75, 255, 0.9), rgba(255, 158, 234, 0.6));
+            box-shadow: 0 0 12px rgba(164, 75, 255, 0.5);
+            border-radius: 2px;
+        }
+
+        /* Header section */
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 18px;
+        }
+
+        .panel-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.6px;
+            color: #fff;
+            text-shadow: 0 0 12px rgba(164, 75, 255, 0.8);
+        }
+
+        /* --- Toggle arrow (right edge) --- */
+        #toggle-panel {
+            position: absolute;
+            right: -14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #2b0048, #140028);
+            border: 1px solid rgba(164, 75, 255, 0.5);
+            box-shadow: 0 0 15px rgba(164, 75, 255, 0.4);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
             transition: all 0.3s ease;
+            z-index: 60;
         }
 
+        #toggle-panel:hover {
+            transform: translateY(-50%) scale(1.1);
+            background: radial-gradient(circle at 70% 30%, #3c0072, #1a0031);
+            box-shadow: 0 0 25px rgba(164, 75, 255, 0.6);
+        }
+
+        /* --- Collapsed Mode --- */
         .node-panel.collapsed {
-            width: 60px;
+            width: 68px;
+            padding: 24px 12px;
         }
 
+        .node-panel.collapsed h3,
         .node-panel.collapsed .node-panel-content {
             display: none;
         }
 
-        .node-panel.collapsed .panel-header h3 {
-            display: none;
-        }
-
-        .toggle-panel {
-            background: #2a2a2a;
-            border: none;
-            border-radius: 6px;
-            width: 44px;
-            height: 44px;
-            color: var(--text-color);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-
-        .toggle-panel:hover {
-            background: #3a3a3a;
-            transform: scale(1.05);
-        }
-
-        .panel-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 16px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .node-panel-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-        }
-
+        /* --- Category Sections --- */
         .category-section {
-            margin-bottom: 20px;
+            margin-bottom: 26px;
         }
 
         .category-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 0;
             cursor: pointer;
-            font-weight: 600;
-            color: var(--text-color);
-            transition: color 0.2s;
-            border-bottom: 1px solid var(--border-color);
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 6px 0;
+            transition: all 0.25s ease;
         }
 
         .category-header:hover {
-            color: var(--brand-color);
+            color: #fff;
+            text-shadow: 0 0 10px rgba(164, 75, 255, 0.8);
         }
 
+        .category-header i {
+            transition: transform 0.3s ease;
+        }
+
+        .category-section.collapsed i {
+            transform: rotate(-90deg);
+        }
+
+        /* --- Category Nodes --- */
         .category-nodes {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 8px;
-            margin-top: 12px;
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-left: 4px;
             max-height: 0;
+            opacity: 0;
             overflow: hidden;
-            transition: max-height 0.3s ease;
+            transform: translateY(-6px);
+            transition: all 0.4s ease;
         }
 
-        .category-nodes.expanded {
+        .category-section.expanded .category-nodes {
             max-height: 500px;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Node Buttons --- */
+        .category-nodes button {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            color: #fff;
+            text-align: left;
+            font-size: 14px;
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .category-nodes button:hover {
+            background: rgba(164, 75, 255, 0.15);
+            border-color: rgba(164, 75, 255, 0.4);
+            box-shadow: 0 0 12px rgba(164, 75, 255, 0.4);
+        }
+
+        /* Scrollbar */
+        .node-panel-content {
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 8px;
+        }
+
+        .node-panel-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .node-panel-content::-webkit-scrollbar-thumb {
+            background: rgba(164, 75, 255, 0.25);
+            border-radius: 10px;
+        }
+
+        .node-panel-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(164, 75, 255, 0.5);
         }
 
         /* Channel Bar - Right Side */
@@ -925,6 +1012,35 @@
 
         .add-tag-btn:hover {
             background: #9333ea;
+        }
+
+        .node.expanded {
+            width: 360px !important;
+            transition: all 0.25s ease-in-out;
+            z-index: 10;
+            background-color: var(--node-bg);
+            box-shadow: 0 0 0 3px var(--brand-color-light), 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .node.expanded .expanded-body {
+            margin-top: 8px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 10px;
+        }
+
+        .node.expanded .node-field {
+            margin: 6px 0;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 6px;
+            padding: 6px 8px;
+        }
+
+        .node.expanded .node-field label {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            text-transform: uppercase;
         }
     </style>
 </head>
@@ -1820,14 +1936,94 @@
                     const node = state.nodes.find(n => n.id === nodeId);
 
                     el.addEventListener('mousedown', e => onNodeMouseDown(e, nodeId));
-
-                    // Add double-click listener for opening settings
+                    // Add double-click listener for expanding node box
+                    // Add double-click listener to expand node box itself (no sidebar)
+                    // Add double-click listener to expand node fully (auto-sized, no scrollbar)
                     el.addEventListener('dblclick', (e) => {
                         e.stopPropagation();
-                        selectedNodeIds.clear();
-                        selectedNodeIds.add(nodeId);
-                        render();
-                        openSettingsPanel(node);
+                        const node = state.nodes.find(n => n.id === nodeId);
+                        if (!node) return;
+
+                        // Collapse all other expanded nodes first
+                        document.querySelectorAll('.node.expanded').forEach(n => {
+                            n.classList.remove('expanded');
+                            const body = n.querySelector('.expanded-body');
+                            if (body) body.remove();
+                        });
+
+                        const expanded = el.classList.toggle('expanded');
+
+                        if (expanded) {
+                            const nodeDef = Object.values(nodeTypes).flat().find(n => n.type === node.type);
+                            if (!nodeDef || !nodeDef.properties) return;
+
+                            let html = `<div class="expanded-body mt-2">`;
+
+                            for (const [key, prop] of Object.entries(nodeDef.properties)) {
+                                const value = node[key] ?? prop.value;
+                                if (prop.type === 'select') {
+                                    const opts = prop.options.map(
+                                        o => `<option value="${o}" ${o === value ? 'selected' : ''}>${o}</option>`
+                                    ).join('');
+                                    html += `
+                    <div class="node-field">
+                        <label>${prop.label}</label>
+                        <select class="field-value node-input" data-node-id="${node.id}" data-field="${key}">
+                            ${opts}
+                        </select>
+                    </div>`;
+                                } else if (prop.type === 'boolean') {
+                                    html += `
+                    <div class="toggle-switch">
+                        <span>${prop.label}</span>
+                        <label class="switch">
+                            <input type="checkbox" class="node-input" data-node-id="${node.id}" data-field="${key}" ${value ? 'checked' : ''}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>`;
+                                } else if (prop.type === 'textarea') {
+                                    html += `
+                    <div class="node-field">
+                        <label>${prop.label}</label>
+                        <textarea class="field-value node-input" data-node-id="${node.id}" data-field="${key}">${value}</textarea>
+                    </div>`;
+                                } else {
+                                    html += `
+                    <div class="node-field">
+                        <label>${prop.label}</label>
+                        <input type="text" class="field-value node-input" data-node-id="${node.id}" data-field="${key}" value="${value}">
+                    </div>`;
+                                }
+                            }
+
+                            html += `</div>`;
+                            el.insertAdjacentHTML('beforeend', html);
+
+                            // Smooth expansion (auto height animation)
+                            const expandedBody = el.querySelector('.expanded-body');
+                            el.style.height = el.scrollHeight + "px";
+                            requestAnimationFrame(() => {
+                                el.style.height = "auto";
+                            });
+
+                            // Live update handler
+                            el.querySelectorAll('.node-input').forEach(input => {
+                                input.addEventListener('input', () => {
+                                    const nodeId = parseInt(input.dataset.nodeId);
+                                    const field = input.dataset.field;
+                                    const node = state.nodes.find(n => n.id === nodeId);
+                                    if (node) {
+                                        node[field] = input.type === 'checkbox' ? input.checked : input.value;
+                                        saveState();
+                                    }
+                                });
+                            });
+                        } else {
+                            // Collapse node
+                            const body = el.querySelector('.expanded-body');
+                            if (body) body.remove();
+                            el.style.height = ""; // reset
+                        }
                     });
 
                     // Handle title editing
@@ -2571,6 +2767,28 @@
             }
             init();
         });
+        // Collapse expanded node when clicking outside
+        document.addEventListener('click', (e) => {
+            const isInsideNode = e.target.closest('.node');
+            if (!isInsideNode) {
+                document.querySelectorAll('.node.expanded').forEach(n => {
+                    n.classList.remove('expanded');
+                    const body = n.querySelector('.expanded-body');
+                    if (body) body.remove();
+                });
+            }
+        });
+
+
+
+// Expand/collapse categories
+document.querySelectorAll('.category-header').forEach(header => {
+    header.addEventListener('click', () => {
+        const section = header.closest('.category-section');
+        section.classList.toggle('expanded');
+    });
+});
+
     </script>
 </body>
 
